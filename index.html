@@ -3,733 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rubavu District — Building & Zoning Report</title>
+<title>Rubavu District — Building &amp; Zoning Statistics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css">
 <script src="https://js.arcgis.com/4.29/"></script>
 <style>
 :root {
-  --bg:      #f4f5f7;
-  --white:   #ffffff;
-  --border:  #e2e6ee;
-  --border2: #cdd3e0;
-  --ink:     #0c1420;
-  --ink2:    #47566b;
-  --ink3:    #8e9aac;
-  --blue:    #1a56db;
-  --blue-lt: #eef2fd;
-  --green:   #047857;
-  --green-lt:#ecfdf5;
-  --amber:   #92400e;
-  --amber-lt:#fffbeb;
-  --red:     #b91c1c;
-  --red-lt:  #fef2f2;
-  --teal:    #0e7490;
-  --r:       10px;
-  --r-sm:    6px;
-  --shadow:  0 1px 4px rgba(12,20,32,.06), 0 1px 2px rgba(12,20,32,.04);
-  --shadow-md: 0 4px 16px rgba(12,20,32,.08), 0 2px 6px rgba(12,20,32,.04);
-  --font:    'Bricolage Grotesque', sans-serif;
-  --mono:    'DM Mono', monospace;
+  --bg:        #f4f5f7;
+  --white:     #ffffff;
+  --border:    #e2e6ee;
+  --border2:   #cdd3e0;
+  --ink:       #0c1420;
+  --ink2:      #47566b;
+  --ink3:      #8e9aac;
+  --blue:      #1a56db;
+  --blue-lt:   #eef2fd;
+  --blue-mid:  #1347b8;
+  --teal:      #0e7490;
+  --teal-lt:   #ecfeff;
+  --violet:    #6d28d9;
+  --violet-lt: #f5f3ff;
+  --green:     #047857;
+  --green-lt:  #ecfdf5;
+  --red:       #b91c1c;
+  --red-lt:    #fef2f2;
+  --r:         10px;
+  --r-sm:      6px;
+  --shadow:    0 1px 4px rgba(12,20,32,.06),0 1px 2px rgba(12,20,32,.04);
+  --shadow-md: 0 4px 16px rgba(12,20,32,.08),0 2px 6px rgba(12,20,32,.04);
+  --font:      'Bricolage Grotesque',sans-serif;
+  --mono:      'DM Mono',monospace;
 }
-
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--ink);
-  -webkit-font-smoothing: antialiased;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
 
 /* ── LOADING ── */
-.ov {
-  position:fixed; inset:0; z-index:500;
-  background:rgba(244,245,247,.93);
-  backdrop-filter:blur(6px);
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:14px;
-  transition: opacity .4s;
-}
-.ov.off { opacity:0; pointer-events:none; }
-.ring {
-  width:36px; height:36px; border-radius:50%;
-  border:3px solid var(--border2);
-  border-top-color:var(--blue);
-  animation:spin .7s linear infinite;
-}
-@keyframes spin { to { transform:rotate(360deg); } }
-.ov-txt { font-size:13px; font-weight:500; color:var(--ink2); }
+.ov{position:fixed;inset:0;z-index:500;background:rgba(244,245,247,.93);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .4s;}
+.ov.off{opacity:0;pointer-events:none;}
+.ring{width:36px;height:36px;border-radius:50%;border:3px solid var(--border2);border-top-color:var(--blue);animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ov-txt{font-size:13px;font-weight:500;color:var(--ink2);}
 
-/* ── PAGE SHELL ── */
-.page {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 40px 32px 80px;
-}
+/* ── PAGE ── */
+.page{max-width:1100px;margin:0 auto;padding:40px 32px 80px;}
 
 /* ── REPORT HEADER ── */
-.report-header {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 32px 36px;
-  margin-bottom: 28px;
-  box-shadow: var(--shadow);
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.rh-left {}
-
-.rh-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  background: var(--blue-lt);
-  border: 1px solid rgba(26,86,219,.15);
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--blue);
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  margin-bottom: 14px;
-}
-
-.rh-tag svg { width:10px; height:10px; stroke:var(--blue); fill:none; stroke-width:2.5; }
-
-.rh-title {
-  font-size: clamp(24px, 3vw, 36px);
-  font-weight: 800;
-  letter-spacing: -.6px;
-  line-height: 1.1;
-  color: var(--ink);
-  margin-bottom: 8px;
-}
-
-.rh-title span { color: var(--blue); }
-
-.rh-sub {
-  font-size: 14px;
-  color: var(--ink2);
-  line-height: 1.6;
-  max-width: 520px;
-}
-
-.rh-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--ink3);
-  font-family: var(--mono);
-}
-
-.meta-item svg { width:12px; height:12px; stroke:var(--ink3); fill:none; stroke-width:2; }
-
-.refresh-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: var(--blue);
-  border: none;
-  border-radius: var(--r-sm);
-  color: white;
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .15s;
-  box-shadow: 0 2px 8px rgba(26,86,219,.25);
-}
-.refresh-btn:hover { background: #1347b8; }
-.refresh-btn svg { width:13px; height:13px; stroke:white; fill:none; stroke-width:2.5; }
-.refresh-btn.spin svg { animation:spin .7s linear infinite; }
+.report-header{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px;margin-bottom:28px;box-shadow:var(--shadow);display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.rh-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--blue-lt);border:1px solid rgba(26,86,219,.15);border-radius:100px;font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;}
+.rh-tag svg{width:10px;height:10px;stroke:var(--blue);fill:none;stroke-width:2.5;}
+.rh-title{font-size:clamp(22px,3vw,34px);font-weight:800;letter-spacing:-.6px;line-height:1.1;color:var(--ink);margin-bottom:8px;}
+.rh-title span{color:var(--blue);}
+.rh-sub{font-size:14px;color:var(--ink2);line-height:1.6;max-width:520px;}
+.rh-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3);font-family:var(--mono);}
+.meta-item svg{width:12px;height:12px;stroke:var(--ink3);fill:none;stroke-width:2;}
+.refresh-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--blue);border:none;border-radius:var(--r-sm);color:white;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:background .15s;box-shadow:0 2px 8px rgba(26,86,219,.25);}
+.refresh-btn:hover{background:var(--blue-mid);}
+.refresh-btn svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2.5;}
+.refresh-btn.spin svg{animation:spin .7s linear infinite;}
 
 /* ── FILTER BAR ── */
-.filter-bar {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 16px 20px;
-  margin-bottom: 28px;
-  box-shadow: var(--shadow);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
+.filter-bar{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:28px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.fb-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);flex-shrink:0;}
+.fb-label svg{width:12px;height:12px;stroke:var(--ink3);fill:none;stroke-width:2.5;}
+.fb-divider{width:1px;height:24px;background:var(--border);flex-shrink:0;}
+.fb-group{display:flex;align-items:center;gap:6px;}
+.fb-sel-label{font-size:11px;font-weight:600;color:var(--ink2);white-space:nowrap;}
+.fsel{padding:6px 28px 6px 10px;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%238e9aac' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--ink);font-family:var(--font);font-size:12px;outline:none;cursor:pointer;appearance:none;transition:border-color .15s;min-width:130px;}
+.fsel:focus{border-color:var(--blue);}
+.fsel.on{border-color:var(--blue);background-color:var(--blue-lt);color:var(--blue);font-weight:600;}
+.fb-zone-chips{display:flex;flex-wrap:wrap;gap:4px;flex:1;}
+.zc{padding:3px 9px;border-radius:4px;font-family:var(--mono);font-size:9px;font-weight:700;cursor:pointer;border:1.5px solid transparent;transition:all .15s;opacity:.75;}
+.zc:hover{opacity:1;transform:translateY(-1px);}
+.zc.on{opacity:1;border-color:rgba(0,0,0,.3);box-shadow:0 0 0 2px rgba(0,0,0,.08);}
+.clr-all-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:none;border:1.5px solid var(--border2);border-radius:var(--r-sm);color:var(--ink2);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.clr-all-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-lt);}
+.clr-all-btn svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;}
+.active-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;width:100%;}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:var(--blue-lt);border:1px solid rgba(26,86,219,.2);border-radius:100px;font-size:11px;font-weight:600;color:var(--blue);}
+.tag button{background:none;border:none;color:var(--blue);cursor:pointer;display:flex;align-items:center;opacity:.6;}
+.tag button:hover{opacity:1;}
+.tag button svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:3;}
 
-.fb-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--ink3);
-  flex-shrink: 0;
-}
-.fb-label svg { width:12px; height:12px; stroke:var(--ink3); fill:none; stroke-width:2.5; }
-
-.fb-divider { width:1px; height:24px; background:var(--border); flex-shrink:0; }
-
-.fb-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.fb-sel-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--ink2);
-  white-space: nowrap;
-}
-
-.fsel {
-  padding: 6px 28px 6px 10px;
-  background: var(--bg)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%238e9aac' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
-    no-repeat right 8px center;
-  border: 1.5px solid var(--border);
-  border-radius: var(--r-sm);
-  color: var(--ink);
-  font-family: var(--font);
-  font-size: 12px;
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  transition: border-color .15s;
-  min-width: 130px;
-}
-.fsel:focus { border-color: var(--blue); }
-.fsel.on { border-color: var(--blue); background-color: var(--blue-lt); color: var(--blue); font-weight: 600; }
-
-.fb-zone-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  flex: 1;
-}
-
-.zc {
-  padding: 3px 9px;
-  border-radius: 4px;
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  transition: all .15s;
-  opacity: .75;
-}
-.zc:hover { opacity: 1; transform: translateY(-1px); }
-.zc.on { opacity: 1; border-color: rgba(0,0,0,.3); box-shadow: 0 0 0 2px rgba(0,0,0,.08); }
-
-.clr-all-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  background: none;
-  border: 1.5px solid var(--border2);
-  border-radius: var(--r-sm);
-  color: var(--ink2);
-  font-family: var(--font);
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .15s;
-  flex-shrink: 0;
-}
-.clr-all-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-lt); }
-.clr-all-btn svg { width:10px; height:10px; stroke:currentColor; fill:none; stroke-width:2.5; }
-
-.active-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 6px;
-  width: 100%;
-}
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  background: var(--blue-lt);
-  border: 1px solid rgba(26,86,219,.2);
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--blue);
-}
-.tag button {
-  background: none; border: none;
-  color: var(--blue); cursor: pointer;
-  display: flex; align-items: center;
-  opacity: .6;
-}
-.tag button:hover { opacity: 1; }
-.tag button svg { width:10px; height:10px; stroke:currentColor; fill:none; stroke-width:3; }
-
-/* ── SECTION WRAPPER ── */
-.section {
-  margin-bottom: 28px;
-}
-
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.4px;
-  color: var(--ink2);
-}
-
-.section-title::before {
-  content: '';
-  width: 3px; height: 16px;
-  background: var(--blue);
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-.section-meta {
-  font-size: 11px;
-  color: var(--ink3);
-  font-family: var(--mono);
-}
+/* ── SECTION ── */
+.section{margin-bottom:28px;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.section-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--ink2);}
+.section-title::before{content:'';width:3px;height:16px;background:var(--blue);border-radius:2px;flex-shrink:0;}
+.section-meta{font-size:11px;color:var(--ink3);font-family:var(--mono);}
 
 /* ── KPI GRID ── */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-}
-
-.kpi-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 20px 18px 16px;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-  transition: box-shadow .2s, transform .2s;
-}
-.kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-
-.kpi-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
-  background: var(--kc);
-}
-.kpi-card.b { --kc: var(--blue); }
-.kpi-card.g { --kc: var(--green); }
-.kpi-card.a { --kc: var(--amber); }
-.kpi-card.t { --kc: var(--teal); }
-
-.kpi-icon-wrap {
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  background: rgba(0,0,0,.04);
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 12px;
-  color: var(--kc);
-}
-.kpi-icon-wrap svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
-
-.kpi-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--ink3);
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
-.kpi-val {
-  font-family: var(--mono);
-  font-size: 28px;
-  font-weight: 500;
-  color: var(--kc);
-  line-height: 1;
-  margin-bottom: 5px;
-}
-
-.kpi-sub {
-  font-size: 11px;
-  color: var(--ink3);
-}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px 18px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;}
+.kpi-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
+.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc);}
+.kpi-card.b{--kc:var(--blue);}
+.kpi-card.t{--kc:var(--teal);}
+.kpi-card.v{--kc:var(--violet);}
+.kpi-card.g{--kc:var(--green);}
+.kpi-icon-wrap{width:32px;height:32px;border-radius:8px;background:rgba(0,0,0,.04);display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:var(--kc);}
+.kpi-icon-wrap svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+.kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);font-weight:700;margin-bottom:5px;}
+.kpi-val{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--kc);line-height:1;margin-bottom:5px;}
+.kpi-sub{font-size:11px;color:var(--ink3);}
 
 /* ── MAP ── */
-.map-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-
-.map-toolbar {
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.map-toolbar-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink);
-}
-.map-toolbar-title svg { width:15px; height:15px; stroke:var(--blue); fill:none; stroke-width:2; }
-
-.map-toolbar-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--ink3);
-}
-.map-toolbar-hint svg { width:12px; height:12px; stroke:var(--ink3); fill:none; stroke-width:2; }
-
-#viewDiv { width:100%; height:480px; }
-
-/* ── TWO-COL LAYOUT ── */
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.two-col.wide-left {
-  grid-template-columns: 3fr 2fr;
-}
+.map-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
+.map-toolbar{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.map-toolbar-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink);}
+.map-toolbar-title svg{width:15px;height:15px;stroke:var(--blue);fill:none;stroke-width:2;}
+.map-toolbar-hint{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink3);}
+.map-toolbar-hint svg{width:12px;height:12px;stroke:var(--ink3);fill:none;stroke-width:2;}
+#viewDiv{width:100%;height:480px;}
 
 /* ── CHART CARD ── */
-.chart-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 20px;
-  box-shadow: var(--shadow);
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);}
+.chart-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.chart-card-title{font-size:13px;font-weight:700;color:var(--ink);}
+.chart-card-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
+.chart-total-val{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--ink);text-align:right;}
+.chart-total-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);text-align:right;}
+
+/* ── BAR ROW — clickable ── */
+.bar-list{display:flex;flex-direction:column;gap:6px;}
+.bar-row{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer;transition:background .15s;}
+.bar-row:hover{background:var(--blue-lt);}
+.bar-row.active{background:var(--blue-lt);outline:1.5px solid rgba(26,86,219,.3);outline-offset:-1px;}
+.bar-label{width:72px;font-size:11px;color:var(--ink2);text-align:right;flex-shrink:0;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-track{flex:1;height:24px;background:var(--bg);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;min-width:40px;transition:width .55s cubic-bezier(.4,0,.2,1);}
+.bar-fill span{font-family:var(--mono);font-size:10px;font-weight:700;}
+.bar-pct{width:36px;text-align:right;font-family:var(--mono);font-size:10px;color:var(--ink3);flex-shrink:0;}
+
+/* ── TWO / THREE COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.two-col.wide{grid-template-columns:3fr 2fr;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* ── SECTOR CARDS ── */
+.sector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.sector-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);transition:all .2s;cursor:pointer;}
+.sector-card:hover{box-shadow:var(--shadow-md);border-color:var(--blue);transform:translateY(-2px);}
+.sector-card.active{border-color:var(--blue);background:var(--blue-lt);}
+.sc-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+.sc-val{font-family:var(--mono);font-size:16px;font-weight:500;color:var(--blue);}
+.sc-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);}
+.sc-bar{margin-top:10px;height:4px;background:var(--bg);border-radius:2px;overflow:hidden;}
+.sc-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:2px;transition:width .5s ease;}
+
+/* ── TABLE ── */
+.zone-table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;}
+.zt-toolbar{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.zt-title{font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.zt-title svg{width:15px;height:15px;stroke:var(--blue);fill:none;stroke-width:2;}
+.dl-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:var(--green-lt);border:1.5px solid rgba(4,120,87,.2);border-radius:var(--r-sm);color:var(--green);font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;}
+.dl-btn:hover{background:#d1fae5;}
+.dl-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{padding:9px 14px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);font-weight:700;background:var(--bg);border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid #f1f3f7;transition:background .12s;cursor:pointer;}
+tbody tr:hover{background:var(--blue-lt);}
+tbody tr:last-child{border-bottom:none;}
+tbody td{padding:9px 14px;color:var(--ink2);}
+tbody td:first-child{color:var(--ink);font-weight:600;}
+.chip{display:inline-block;padding:2px 8px;border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:700;}
+.badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-family:var(--mono);font-size:9px;font-weight:700;background:var(--bg);color:var(--ink3);border:1px solid var(--border);}
+.badge.top{background:rgba(26,86,219,.08);color:var(--blue);border-color:rgba(26,86,219,.2);}
+.mini-bar-wrap{display:flex;align-items:center;gap:8px;}
+.mini-bar{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden;min-width:60px;}
+.mini-bar-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .page{padding:24px 16px 60px;}
+  .kpi-grid,.three-col{grid-template-columns:1fr 1fr;}
+  .two-col,.two-col.wide{grid-template-columns:1fr;}
+  .report-header{flex-direction:column;}
+  .rh-meta{align-items:flex-start;}
+}
+@media(max-width:500px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .filter-bar{flex-direction:column;align-items:flex-start;}
 }
 
-.chart-card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.chart-card-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.chart-card-sub {
-  font-size: 11px;
-  color: var(--ink3);
-  margin-top: 2px;
-}
-
-.chart-total {
-  text-align: right;
-}
-.chart-total-val {
-  font-family: var(--mono);
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--ink);
-}
-.chart-total-lbl {
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  color: var(--ink3);
-}
-
-/* ── BAR ROWS ── */
-.bar-list { display: flex; flex-direction: column; gap: 7px; }
-
-.bar-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 3px 4px;
-  border-radius: 6px;
-  transition: background .15s;
-  cursor: default;
-}
-.bar-row:hover { background: var(--bg); }
-
-.bar-label {
-  width: 68px;
-  font-size: 11px;
-  color: var(--ink2);
-  text-align: right;
-  flex-shrink: 0;
-  font-family: var(--mono);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.bar-track {
-  flex: 1;
-  height: 24px;
-  background: var(--bg);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 8px;
-  min-width: 40px;
-  transition: width .55s cubic-bezier(.4,0,.2,1);
-}
-
-.bar-fill span {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.bar-pct {
-  width: 36px;
-  text-align: right;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--ink3);
-  flex-shrink: 0;
-}
-
-/* ── ZONE TABLE ── */
-.zone-table-wrap {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.zt-toolbar {
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.zt-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.zt-title svg { width:15px; height:15px; stroke:var(--blue); fill:none; stroke-width:2; }
-
-.dl-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  background: var(--green-lt);
-  border: 1.5px solid rgba(4,120,87,.2);
-  border-radius: var(--r-sm);
-  color: var(--green);
-  font-family: var(--font);
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all .15s;
-}
-.dl-btn:hover { background: #d1fae5; }
-.dl-btn svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:2.5; }
-
-table { width:100%; border-collapse:collapse; font-size:12px; }
-
-thead th {
-  padding: 9px 14px;
-  text-align: left;
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  color: var(--ink3);
-  font-weight: 700;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-
-tbody tr {
-  border-bottom: 1px solid #f1f3f7;
-  transition: background .12s;
-  cursor: pointer;
-}
-tbody tr:hover { background: var(--blue-lt); }
-tbody tr:last-child { border-bottom: none; }
-
-tbody td {
-  padding: 9px 14px;
-  color: var(--ink2);
-}
-tbody td:first-child { color: var(--ink); font-weight: 600; }
-
-.chip {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  background: var(--bg);
-  color: var(--ink3);
-  border: 1px solid var(--border);
-}
-.badge.top { background: rgba(26,86,219,.08); color: var(--blue); border-color: rgba(26,86,219,.2); }
-
-.mini-bar-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.mini-bar {
-  flex: 1;
-  height: 5px;
-  background: var(--bg);
-  border-radius: 3px;
-  overflow: hidden;
-  min-width: 60px;
-}
-.mini-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width .5s ease;
-}
-
-/* ── SECTOR GRID ── */
-.sector-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
-}
-
-.sector-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 14px 16px;
-  box-shadow: var(--shadow);
-  transition: all .2s;
-  cursor: pointer;
-}
-.sector-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--blue);
-  transform: translateY(-2px);
-}
-
-.sc-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 8px;
-}
-
-.sc-stats { display: flex; gap: 12px; }
-.sc-stat-val { font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--blue); }
-.sc-stat-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: .6px; color: var(--ink3); }
-
-.sc-bar {
-  margin-top: 10px;
-  height: 4px;
-  background: var(--bg);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.sc-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--blue), var(--teal));
-  border-radius: 2px;
-  transition: width .5s ease;
-}
-
-/* Responsive */
-@media(max-width:860px) {
-  .page { padding:24px 16px 60px; }
-  .kpi-grid { grid-template-columns: 1fr 1fr; }
-  .two-col, .two-col.wide-left { grid-template-columns: 1fr; }
-  .report-header { flex-direction:column; }
-  .rh-meta { align-items: flex-start; }
-}
-@media(max-width:500px) {
-  .kpi-grid { grid-template-columns: 1fr 1fr; }
-  .filter-bar { flex-direction:column; align-items:flex-start; }
-}
-
-/* Entrance */
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(10px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-.fade-up { opacity:0; animation:fadeUp .4s ease forwards; }
-.d1{animation-delay:.05s} .d2{animation-delay:.1s} .d3{animation-delay:.15s}
-.d4{animation-delay:.2s}  .d5{animation-delay:.25s} .d6{animation-delay:.3s}
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{opacity:0;animation:fadeUp .4s ease forwards;}
+.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}
+.d4{animation-delay:.2s}.d5{animation-delay:.25s}.d6{animation-delay:.3s}.d7{animation-delay:.35s}
 </style>
 </head>
 <body>
@@ -741,15 +204,15 @@ tbody td:first-child { color: var(--ink); font-weight: 600; }
 
 <div class="page">
 
-  <!-- ══ REPORT HEADER ══ -->
+  <!-- HEADER -->
   <div class="report-header fade-up d1">
     <div class="rh-left">
       <div class="rh-tag">
         <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Western Province · Rwanda
       </div>
-      <h1 class="rh-title">Rubavu District<br><span>Building &amp; Masterplan</span> Compliance</h1>
-      <p class="rh-sub">Live statistics on building distribution, zoning classifications, and compliance with the district masterplan. </p>
+      <h1 class="rh-title">Rubavu District<br><span>Building &amp; Zoning</span> Statistics</h1>
+      <p class="rh-sub">Total building distribution and masterplan zoning analysis across sectors, cells, and villages. Data sourced directly from ArcGIS Enterprise.</p>
     </div>
     <div class="rh-meta">
       <div class="meta-item">
@@ -757,8 +220,8 @@ tbody td:first-child { color: var(--ink); font-weight: 600; }
         Updated <span id="lastUpd" style="color:var(--ink2);margin-left:4px">—</span>
       </div>
       <div class="meta-item">
-        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
-  
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        ArcGIS Enterprise
       </div>
       <button class="refresh-btn" id="rfBtn" onclick="refresh()">
         <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
@@ -767,8 +230,8 @@ tbody td:first-child { color: var(--ink); font-weight: 600; }
     </div>
   </div>
 
-  <!-- ══ FILTER BAR ══ -->
-  <div class="filter-bar fade-up d2" id="filterBar">
+  <!-- FILTER BAR -->
+  <div class="filter-bar fade-up d2">
     <div class="fb-label">
       <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
       Filter
@@ -776,24 +239,18 @@ tbody td:first-child { color: var(--ink); font-weight: 600; }
     <div class="fb-divider"></div>
     <div class="fb-group">
       <span class="fb-sel-label">Sector</span>
-      <select class="fsel" id="selS" onchange="onF('sector',this.value)">
-        <option value="">All</option>
-      </select>
+      <select class="fsel" id="selS" onchange="onF('sector',this.value)"><option value="">All</option></select>
     </div>
     <div class="fb-group">
       <span class="fb-sel-label">Cell</span>
-      <select class="fsel" id="selC" onchange="onF('cell',this.value)">
-        <option value="">All</option>
-      </select>
+      <select class="fsel" id="selC" onchange="onF('cell',this.value)"><option value="">All</option></select>
     </div>
     <div class="fb-group">
       <span class="fb-sel-label">Village</span>
-      <select class="fsel" id="selV" onchange="onF('village',this.value)">
-        <option value="">All</option>
-      </select>
+      <select class="fsel" id="selV" onchange="onF('village',this.value)"><option value="">All</option></select>
     </div>
     <div class="fb-divider"></div>
-    <div class="fb-zone-chips" id="zoneGrid"></div>
+    <div class="fb-zone-chips" id="zoneChips"></div>
     <button class="clr-all-btn" onclick="clearAll()">
       <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
       Clear all
@@ -801,11 +258,11 @@ tbody td:first-child { color: var(--ink); font-weight: 600; }
     <div class="active-tags" id="actTags"></div>
   </div>
 
-  <!-- ══ SECTION 1 — KPI OVERVIEW ══ -->
+  <!-- SECTION 1 — KPIs -->
   <div class="section fade-up d3">
     <div class="section-head">
       <span class="section-title">Overview</span>
-      <span class="section-meta" id="overviewMeta">—</span>
+      <span class="section-meta" id="ovMeta">—</span>
     </div>
     <div class="kpi-grid">
       <div class="kpi-card b">
@@ -816,38 +273,38 @@ tbody td:first-child { color: var(--ink); font-weight: 600; }
         <div class="kpi-val" id="kT">—</div>
         <div class="kpi-sub">Detected in Rubavu</div>
       </div>
-      <div class="kpi-card g">
-        <div class="kpi-icon-wrap">
-          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        </div>
-        <div class="kpi-label">Legal</div>
-        <div class="kpi-val" id="kL">—</div>
-        <div class="kpi-sub" id="kLs">Permit verified</div>
-      </div>
-      <div class="kpi-card a">
-        <div class="kpi-icon-wrap">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <div class="kpi-label">Existing </div>
-        <div class="kpi-val" id="kE">—</div>
-        <div class="kpi-sub" id="kEs">Pending verification</div>
-      </div>
       <div class="kpi-card t">
+        <div class="kpi-icon-wrap">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="kpi-label">Sectors</div>
+        <div class="kpi-val" id="kS">—</div>
+        <div class="kpi-sub">Administrative sectors</div>
+      </div>
+      <div class="kpi-card v">
+        <div class="kpi-icon-wrap">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="kpi-label">Zone Types</div>
+        <div class="kpi-val" id="kZ">—</div>
+        <div class="kpi-sub">Distinct zoning codes</div>
+      </div>
+      <div class="kpi-card g">
         <div class="kpi-icon-wrap">
           <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         </div>
-        <div class="kpi-label">Zoning Types</div>
-        <div class="kpi-val" id="kZ">—</div>
-        <div class="kpi-sub">Distinct zone codes</div>
+        <div class="kpi-label">Villages</div>
+        <div class="kpi-val" id="kV">—</div>
+        <div class="kpi-sub">Covered villages</div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SECTION 2 — MAP ══ -->
+  <!-- SECTION 2 — MAP -->
   <div class="section fade-up d4">
     <div class="section-head">
       <span class="section-title">Spatial Distribution</span>
-      <span class="section-meta">Click a building to zoom and filter</span>
+      <span class="section-meta">Click any building to filter the report</span>
     </div>
     <div class="map-card">
       <div class="map-toolbar">
@@ -864,67 +321,114 @@ tbody td:first-child { color: var(--ink); font-weight: 600; }
     </div>
   </div>
 
-  <!-- ══ SECTION 3 — ZONE + SECTOR CHARTS ══ -->
-  <div class="section fade-up d5">
+  <!-- SECTION 3 — BUILDINGS BY SECTOR / CELL / VILLAGE -->
+  <div class="section fade-up d4">
     <div class="section-head">
-      <span class="section-title">Zoning &amp; Sector Analysis</span>
-      <span class="section-meta" id="chartsMeta">—</span>
+      <span class="section-title">Buildings by Administrative Area</span>
+      <span class="section-meta" id="areaMeta">—</span>
     </div>
-    <div class="two-col wide-left">
+    <div class="three-col">
 
-      <!-- Zone bars -->
+      <!-- By Sector -->
       <div class="chart-card">
         <div class="chart-card-head">
           <div>
-            <div class="chart-card-title">Buildings by Zone Code</div>
-            <div class="chart-card-sub">Spatial distribution across zoning classifications</div>
+            <div class="chart-card-title">By Sector</div>
+            <div class="chart-card-sub">Click a bar to filter</div>
           </div>
-          <div class="chart-total">
-            <div class="chart-total-val" id="zoneTotVal">—</div>
-            <div class="chart-total-lbl">Total</div>
-          </div>
-        </div>
-        <div class="bar-list" id="zoneBars"></div>
-      </div>
-
-      <!-- Sector bars -->
-      <div class="chart-card">
-        <div class="chart-card-head">
           <div>
-            <div class="chart-card-title">Buildings by Sector</div>
-            <div class="chart-card-sub">Top sectors by building count</div>
-          </div>
-          <div class="chart-total">
-            <div class="chart-total-val" id="sectTotVal">—</div>
+            <div class="chart-total-val" id="sectTot">—</div>
             <div class="chart-total-lbl">Total</div>
           </div>
         </div>
         <div class="bar-list" id="sectorBars"></div>
       </div>
 
+      <!-- By Cell -->
+      <div class="chart-card">
+        <div class="chart-card-head">
+          <div>
+            <div class="chart-card-title">By Cell</div>
+            <div class="chart-card-sub">Click a bar to filter</div>
+          </div>
+          <div>
+            <div class="chart-total-val" id="cellTot">—</div>
+            <div class="chart-total-lbl">Total</div>
+          </div>
+        </div>
+        <div class="bar-list" id="cellBars"></div>
+      </div>
+
+      <!-- By Village -->
+      <div class="chart-card">
+        <div class="chart-card-head">
+          <div>
+            <div class="chart-card-title">By Village</div>
+            <div class="chart-card-sub">Top 10 · Click to filter</div>
+          </div>
+          <div>
+            <div class="chart-total-val" id="villTot">—</div>
+            <div class="chart-total-lbl">Total</div>
+          </div>
+        </div>
+        <div class="bar-list" id="villageBars"></div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ══ SECTION 4 — SECTOR CARDS ══ -->
-  <div class="section fade-up d6">
+  <!-- SECTION 4 — BUILDINGS BY ZONING -->
+  <div class="section fade-up d5">
     <div class="section-head">
-      <span class="section-title">Sector Breakdown</span>
-      <span class="section-meta" id="sectorMeta">—</span>
+      <span class="section-title">Buildings by Zoning Classification</span>
+      <span class="section-meta" id="zoneMeta">—</span>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Total Buildings per Zone Code</div>
+          <div class="chart-card-sub">Distribution across masterplan zoning classifications · Click any zone to filter</div>
+        </div>
+        <div>
+          <div class="chart-total-val" id="zoneTot">—</div>
+          <div class="chart-total-lbl">Total Buildings</div>
+        </div>
+      </div>
+      <div class="bar-list" id="zoneBars"></div>
+    </div>
+  </div>
+
+  <!-- SECTION 5 — SECTOR CARDS -->
+  <div class="section fade-up d5">
+    <div class="section-head">
+      <span class="section-title">Sector Overview</span>
+      <span class="section-meta" id="secCardMeta">—</span>
     </div>
     <div class="sector-grid" id="sectorGrid"></div>
   </div>
 
-  <!-- ══ SECTION 5 — FULL ZONE TABLE ══ -->
+  <!-- SECTION 6 — ZONING PER SECTOR (top 5 sectors) -->
   <div class="section fade-up d6">
     <div class="section-head">
-      <span class="section-title">Full Zoning Classification Table</span>
+      <span class="section-title">Zoning Distribution per Sector</span>
+      <span class="section-meta">Top 6 sectors · Click any bar to filter</span>
+    </div>
+    <div class="three-col" id="zonePerSector"></div>
+  </div>
+
+  <!-- SECTION 7 — FULL TABLE -->
+  <div class="section fade-up d7">
+    <div class="section-head">
+      <span class="section-title">Full Building Statistics Table</span>
       <span class="section-meta" id="tableMeta">—</span>
     </div>
     <div class="zone-table-wrap">
       <div class="zt-toolbar">
         <div class="zt-title">
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
-          Zone × Sector · Building Statistics
+          Sector
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin:0 3px;vertical-align:-1px;opacity:.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          Zone Code · Building Count
         </div>
         <button class="dl-btn" onclick="downloadCSV()">
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
@@ -938,10 +442,8 @@ tbody td:first-child { color: var(--ink); font-weight: 600; }
             <th>Sector</th>
             <th>Zone Code</th>
             <th>Zone Type</th>
-            <th>Total</th>
-            <th>Legal</th>
-            <th>Existing</th>
-            <th>Share</th>
+            <th>Buildings</th>
+            <th>Share of Total</th>
           </tr>
         </thead>
         <tbody id="tbl"></tbody>
@@ -949,7 +451,7 @@ tbody td:first-child { color: var(--ink); font-weight: 600; }
     </div>
   </div>
 
-</div><!-- /page -->
+</div>
 
 <script>
 // ══════════════════════════════════
@@ -959,8 +461,7 @@ const SVC    = 'https://gh.space.gov.rw/server/rest/services/Rubavu_Buildings/Fe
 const PORTAL = 'https://gh.space.gov.rw/portal';
 const WEBMAP = '4cf12c58e97f4dcf9d4ffd524e085303';
 
-const F = { status:'legal_t', zone:'zone_code', sector:'sector', cell:'cell', village:'village' };
-const STATUS = { legal:'Legal', illegal:'Illegal', existing:'Existing' };
+const F = { zone:'zone_code', sector:'sector', cell:'cell', village:'village' };
 
 const ZONE_COLORS = {
   'R1A':'#ffec18','R1B':'#ffebb0','R2':'#ffbb36','R3':'#ff7f00','R4':'#ff5a25','R1':'#ffe97a',
@@ -973,7 +474,6 @@ const ZONE_COLORS = {
   'PA':'#00aa66','W1B':'#0088bb','W2':'#0099cc','W3':'#00aadd',
   'U':'#8899aa','B1':'#556655','B2':'#667766','B4':'#778877','WB':'#0055aa','OS':'#338844'
 };
-
 const ZONE_NAMES = {
   'R1A':'Low Density Res.','R1B':'Rural Residential','R2':'Medium Density','R3':'Medium Expansion',
   'R4':'High Density','R1':'Residential','C1':'Mixed Commercial','C3':'City Centre','C4':'Commercial',
@@ -985,412 +485,417 @@ const ZONE_NAMES = {
   'PA':'Protected Area','W1B':'Wetland','W2':'Wetland 2','W3':'Wetland 3',
   'U':'Urban','B1':'Buffer Zone','B2':'Buffer 2','B4':'Buffer 4','WB':'Water Body','OS':'Open Space'
 };
-
 const LIGHT_Z = new Set(['R1A','R1B','R2','R1','T1','T2','PF5','PF6']);
 
 // ── State
 let filters = { sector:'', cell:'', village:'', zone:'' };
 let tableRows = [];
-let mapView = null, flayer = null;
+let mapView=null, flayer=null;
 
 // ── Utils
 const $   = id => document.getElementById(id);
 const fmt = n  => (n||0).toLocaleString();
-const pct = (a,b) => b > 0 ? (a/b*100).toFixed(1)+'%' : '0%';
-const isLight = c => LIGHT_Z.has(c);
+const pct = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '0%';
+const isL = z  => LIGHT_Z.has(z);
+const zc  = z  => ZONE_COLORS[z]||'#94a3b8';
+const tc  = z  => isL(z)?'#0c1420':'rgba(255,255,255,.9)';
 
-function setOv(txt) {
-  if (txt) { $('ov').classList.remove('off'); $('ovTxt').textContent = txt; }
-  else      { $('ov').classList.add('off'); }
-}
+function setOv(txt){ if(txt){$('ov').classList.remove('off');$('ovTxt').textContent=txt;}else $('ov').classList.add('off'); }
 
-function buildWhere() {
-  const p = [];
-  if (filters.sector)  p.push(`${F.sector}='${filters.sector.replace(/'/g,"''")}'`);
-  if (filters.cell)    p.push(`${F.cell}='${filters.cell.replace(/'/g,"''")}'`);
-  if (filters.village) p.push(`${F.village}='${filters.village.replace(/'/g,"''")}'`);
-  if (filters.zone)    p.push(`${F.zone}='${filters.zone.replace(/'/g,"''")}'`);
+function buildWhere(){
+  const p=[];
+  if(filters.sector)  p.push(`${F.sector}='${filters.sector.replace(/'/g,"''")}'`);
+  if(filters.cell)    p.push(`${F.cell}='${filters.cell.replace(/'/g,"''")}'`);
+  if(filters.village) p.push(`${F.village}='${filters.village.replace(/'/g,"''")}'`);
+  if(filters.zone)    p.push(`${F.zone}='${filters.zone.replace(/'/g,"''")}'`);
   return p.length ? p.join(' AND ') : '1=1';
 }
 
-async function qStats(where, groupBy) {
-  const p = new URLSearchParams({
-    where, groupByFieldsForStatistics: groupBy,
-    outStatistics: JSON.stringify([{statisticType:'count',onStatisticField:'OBJECTID',outStatisticFieldName:'cnt'}]),
-    returnGeometry: false, f:'json'
-  });
-  const j = await (await fetch(`${SVC}/query?${p}`)).json();
-  if (j.error) throw new Error(j.error.message);
+async function qStats(where,groupBy){
+  const p=new URLSearchParams({where,groupByFieldsForStatistics:groupBy,
+    outStatistics:JSON.stringify([{statisticType:'count',onStatisticField:'OBJECTID',outStatisticFieldName:'cnt'}]),
+    returnGeometry:false,f:'json'});
+  const j=await(await fetch(`${SVC}/query?${p}`)).json();
+  if(j.error) throw new Error(j.error.message);
   return j.features||[];
 }
 
-async function qDistinct(field, where='1=1') {
-  const p = new URLSearchParams({
-    where, outFields: field,
-    returnDistinctValues: true, returnGeometry: false,
-    orderByFields: field, resultRecordCount: 500, f:'json'
-  });
-  const j = await (await fetch(`${SVC}/query?${p}`)).json();
-  if (j.error) throw new Error(j.error.message);
+async function qDistinct(field,where='1=1'){
+  const p=new URLSearchParams({where,outFields:field,returnDistinctValues:true,
+    returnGeometry:false,orderByFields:field,resultRecordCount:500,f:'json'});
+  const j=await(await fetch(`${SVC}/query?${p}`)).json();
+  if(j.error) throw new Error(j.error.message);
   return (j.features||[]).map(f=>f.attributes[field]).filter(Boolean).sort();
 }
 
 // ══════════════════════════════════
 // MAP
 // ══════════════════════════════════
-require([
-  'esri/config','esri/WebMap','esri/views/MapView',
-  'esri/layers/FeatureLayer','esri/widgets/Search','esri/widgets/Home'
-], function(esriConfig, WebMap, MapView, FeatureLayer, Search, Home) {
+require(['esri/config','esri/WebMap','esri/views/MapView','esri/layers/FeatureLayer','esri/widgets/Search','esri/widgets/Home'],
+function(esriConfig,WebMap,MapView,FeatureLayer,Search,Home){
+  esriConfig.portalUrl=PORTAL;
+  const wm=new WebMap({portalItem:{id:WEBMAP,portal:{url:PORTAL}}});
+  mapView=new MapView({container:'viewDiv',map:wm,ui:{components:['zoom']}});
+  mapView.ui.add(new Home({view:mapView}),'top-left');
+  mapView.ui.add(new Search({view:mapView}),'top-right');
 
-  esriConfig.portalUrl = PORTAL;
-  const wm = new WebMap({ portalItem: { id: WEBMAP, portal: { url: PORTAL } } });
+  mapView.when(()=>{
+    wm.layers.forEach(l=>{ if(l.title&&l.title.toLowerCase().includes('building')) flayer=l; });
+    if(!flayer) flayer=new FeatureLayer({url:SVC,outFields:['*'],popupEnabled:false});
 
-  mapView = new MapView({
-    container: 'viewDiv', map: wm,
-    ui: { components: ['zoom'] }
-  });
-
-  mapView.ui.add(new Home({ view: mapView }), 'top-left');
-  mapView.ui.add(new Search({ view: mapView }), 'top-right');
-
-  mapView.when(() => {
-    wm.layers.forEach(l => {
-      if (l.title && l.title.toLowerCase().includes('building')) flayer = l;
-    });
-    if (!flayer) flayer = new FeatureLayer({ url: SVC, outFields:['*'], popupEnabled: false });
-
-    mapView.on('click', async evt => {
-      const res = await mapView.hitTest(evt, { include: flayer || wm.layers });
-      const hit = res.results[0];
-      if (!hit) return;
-      const a = hit.graphic.attributes;
-      const sector = a[F.sector] || '';
-      if (sector) {
-        filters.sector = sector;
-        $('selS').value = sector;
-        $('selS').classList.add('on');
-        $('clrS') && $('clrS').classList.add('on');
-        zoomToSector(sector);
-        loadData();
-      }
+    mapView.on('click',async evt=>{
+      const res=await mapView.hitTest(evt,{include:flayer||wm.layers});
+      const hit=res.results[0];
+      if(!hit) return;
+      const a=hit.graphic.attributes;
+      const sector=a[F.sector]||'';
+      const zone=a[F.zone]||'';
+      if(sector){ filters.sector=sector; $('selS').value=sector; $('selS').classList.add('on'); zoomTo(sector); }
+      if(zone)  { filters.zone=zone; highlightZone(zone); }
+      loadData();
     });
   });
 
-  window._zoom = async function(name) {
-    if (!flayer || !mapView) return;
-    try {
-      const q = { where:`${F.sector}='${name.replace(/'/g,"''")}'`, returnGeometry:true, outSpatialReference:mapView.spatialReference };
-      const r = flayer.queryExtent ? await flayer.queryExtent(q) : null;
-      if (r?.extent) mapView.goTo(r.extent.expand(1.35), { duration:700, easing:'ease-in-out' });
-    } catch(e) {}
+  window._zoom=async function(name){
+    if(!flayer||!mapView) return;
+    try{
+      const q={where:`${F.sector}='${name.replace(/'/g,"''")}'`,returnGeometry:true,outSpatialReference:mapView.spatialReference};
+      const r=flayer.queryExtent?await flayer.queryExtent(q):null;
+      if(r?.extent) mapView.goTo(r.extent.expand(1.35),{duration:700,easing:'ease-in-out'});
+    }catch(e){}
   };
-
-  window._def = function(where) {
-    const e = where === '1=1' ? '' : where;
-    if (flayer) flayer.definitionExpression = e;
-    wm.layers.forEach(l => { if (l.definitionExpression !== undefined) l.definitionExpression = e; });
+  window._def=function(where){
+    const e=where==='1=1'?'':where;
+    if(flayer) flayer.definitionExpression=e;
+    wm.layers.forEach(l=>{ if(l.definitionExpression!==undefined) l.definitionExpression=e; });
   };
 });
 
-function zoomToSector(s) { if (window._zoom) _zoom(s); }
-function applyDef(w)     { if (window._def)  _def(w); }
+function zoomTo(s){ if(window._zoom) _zoom(s); }
+function applyDef(w){ if(window._def) _def(w); }
+
+function highlightZone(z){
+  filters.zone=z;
+  document.querySelectorAll('.zc').forEach(b=>b.classList.toggle('on',b.dataset.z===z));
+}
 
 // ══════════════════════════════════
-// FILTERS
+// FILTERS INIT
 // ══════════════════════════════════
-async function loadFilters() {
-  const [sectors, cells, villages, zones] = await Promise.all([
-    qDistinct(F.sector), qDistinct(F.cell), qDistinct(F.village), qDistinct(F.zone)
+async function loadFilters(){
+  const [sectors,cells,villages,zones]=await Promise.all([
+    qDistinct(F.sector),qDistinct(F.cell),qDistinct(F.village),qDistinct(F.zone)
   ]);
-  populateSel('selS', sectors,  'All');
-  populateSel('selC', cells,    'All');
-  populateSel('selV', villages, 'All');
+  populateSel('selS',sectors,'All');
+  populateSel('selC',cells,'All');
+  populateSel('selV',villages,'All');
   buildChips(zones);
 }
 
-function populateSel(id, vals, ph) {
-  const s = $(id);
-  s.innerHTML = `<option value="">${ph}</option>`;
-  vals.forEach(v => { const o = document.createElement('option'); o.value = o.textContent = v; s.appendChild(o); });
+function populateSel(id,vals,ph){
+  const s=$(id); s.innerHTML=`<option value="">${ph}</option>`;
+  vals.forEach(v=>{ const o=document.createElement('option'); o.value=o.textContent=v; s.appendChild(o); });
 }
 
-function buildChips(zones) {
-  $('zoneGrid').innerHTML = zones.map(z => {
-    const c  = ZONE_COLORS[z] || '#94a3b8';
-    const tc = isLight(z) ? '#0c1420' : '#fff';
-    return `<button class="zc" data-z="${z}" style="background:${c};color:${tc}"
+function buildChips(zones){
+  $('zoneChips').innerHTML=zones.map(z=>{
+    const c=zc(z), t=isL(z)?'#0c1420':'#fff';
+    return `<button class="zc" data-z="${z}" style="background:${c};color:${t}"
       onclick="onZone('${z}')" title="${ZONE_NAMES[z]||z}">${z}</button>`;
   }).join('');
 }
 
-function onF(type, val) {
-  filters[type] = val;
-  const selMap = { sector:'selS', cell:'selC', village:'selV' };
-  $(selMap[type]).classList.toggle('on', !!val);
-  if (type === 'sector' && val) zoomToSector(val);
+// ── Filter handlers
+function onF(type,val){
+  filters[type]=val;
+  const sel={sector:'selS',cell:'selC',village:'selV'}[type];
+  $(sel).classList.toggle('on',!!val);
+  if(type==='sector'&&val) zoomTo(val);
   loadData();
 }
 
-function onZone(z) {
-  filters.zone = filters.zone === z ? '' : z;
-  document.querySelectorAll('.zc').forEach(b => b.classList.toggle('on', b.dataset.z === filters.zone));
+function onZone(z){
+  filters.zone=filters.zone===z?'':z;
+  document.querySelectorAll('.zc').forEach(b=>b.classList.toggle('on',b.dataset.z===filters.zone));
   loadData();
 }
 
-function clearF(type) {
-  filters[type] = '';
-  const selMap = { sector:'selS', cell:'selC', village:'selV' };
-  if (selMap[type]) { $(selMap[type]).value = ''; $(selMap[type]).classList.remove('on'); }
-  if (type === 'zone') document.querySelectorAll('.zc').forEach(b => b.classList.remove('on'));
+function clearF(type){
+  filters[type]='';
+  const sel={sector:'selS',cell:'selC',village:'selV'}[type];
+  if(sel){ $(sel).value=''; $(sel).classList.remove('on'); }
+  if(type==='zone') document.querySelectorAll('.zc').forEach(b=>b.classList.remove('on'));
   loadData();
 }
 
-function clearAll() {
-  filters = { sector:'', cell:'', village:'', zone:'' };
-  ['selS','selC','selV'].forEach(id => { $(id).value = ''; $(id).classList.remove('on'); });
-  document.querySelectorAll('.zc').forEach(b => b.classList.remove('on'));
-  $('actTags').innerHTML = '';
+function clearAll(){
+  filters={sector:'',cell:'',village:'',zone:''};
+  ['selS','selC','selV'].forEach(id=>{ $(id).value=''; $(id).classList.remove('on'); });
+  document.querySelectorAll('.zc').forEach(b=>b.classList.remove('on'));
+  $('actTags').innerHTML='';
   applyDef('1=1');
   loadData();
 }
 
-function renderTags() {
-  const tags = [];
-  if (filters.sector)  tags.push({ k:'sector',  l:'Sector: '+filters.sector });
-  if (filters.cell)    tags.push({ k:'cell',     l:'Cell: '+filters.cell });
-  if (filters.village) tags.push({ k:'village',  l:'Village: '+filters.village });
-  if (filters.zone)    tags.push({ k:'zone',     l:'Zone: '+filters.zone });
-  $('actTags').innerHTML = tags.map(t =>
-    `<span class="tag">${t.l}
-      <button onclick="clearF('${t.k}')">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-          <path d="M18 6L6 18M6 6l12 12"/>
-        </svg>
-      </button>
-    </span>`
+function renderTags(){
+  const tags=[];
+  if(filters.sector)  tags.push({k:'sector', l:'Sector: '+filters.sector});
+  if(filters.cell)    tags.push({k:'cell',   l:'Cell: '+filters.cell});
+  if(filters.village) tags.push({k:'village',l:'Village: '+filters.village});
+  if(filters.zone)    tags.push({k:'zone',   l:'Zone: '+filters.zone});
+  $('actTags').innerHTML=tags.map(t=>
+    `<span class="tag">${t.l}<button onclick="clearF('${t.k}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>`
   ).join('');
 }
 
 // ══════════════════════════════════
-// DATA
+// BAR BUILDER — clickable
 // ══════════════════════════════════
-async function loadData() {
-  const where = buildWhere();
+function buildBars(items, total, onClickFn, colorFn){
+  // items: [{label, cnt}]
+  const max = items[0]?.cnt||1;
+  return items.map(item=>{
+    const w   = (item.cnt/max*100).toFixed(1);
+    const col = colorFn ? colorFn(item.label) : null;
+    const fillStyle = col
+      ? `background:${col}`
+      : `background:linear-gradient(90deg,#1a56db,#0e7490)`;
+    const textCol = col ? (isL(item.label)?'#0c1420':'rgba(255,255,255,.9)') : 'rgba(255,255,255,.9)';
+    const activeClass = (
+      (onClickFn==='sector'  && filters.sector===item.label) ||
+      (onClickFn==='cell'    && filters.cell===item.label)   ||
+      (onClickFn==='village' && filters.village===item.label)||
+      (onClickFn==='zone'    && filters.zone===item.label)
+    ) ? 'active' : '';
+    return `<div class="bar-row ${activeClass}" onclick="barClick('${onClickFn}','${item.label.replace(/'/g,"\\'")}')">
+      <span class="bar-label" title="${item.label}">${item.label.slice(0,10)}</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${w}%;${fillStyle}">
+          <span style="color:${textCol}">${fmt(item.cnt)}</span>
+        </div>
+      </div>
+      <span class="bar-pct">${pct(item.cnt,total)}</span>
+    </div>`;
+  }).join('');
+}
+
+function barClick(type, val){
+  if(type==='zone'){
+    filters.zone = filters.zone===val ? '' : val;
+    document.querySelectorAll('.zc').forEach(b=>b.classList.toggle('on',b.dataset.z===filters.zone));
+    const sel = {sector:'selS',cell:'selC',village:'selV'}[type];
+    loadData();
+    return;
+  }
+  filters[type] = filters[type]===val ? '' : val;
+  const selMap = {sector:'selS',cell:'selC',village:'selV'};
+  const selEl  = $(selMap[type]);
+  if(selEl){ selEl.value=filters[type]; selEl.classList.toggle('on',!!filters[type]); }
+  if(type==='sector'&&filters[type]) zoomTo(filters[type]);
+  loadData();
+}
+
+// ══════════════════════════════════
+// DATA LOAD
+// ══════════════════════════════════
+async function loadData(){
+  const where=buildWhere();
   applyDef(where);
   renderTags();
   setOv('Loading…');
 
-  try {
-    const [statusRows, zoneRows, sectorRows, szRows] = await Promise.all([
-      qStats(where, F.status),
-      qStats(where, F.zone),
+  try{
+    // Run all queries in parallel
+    const [
+      secRows, cellRows, villRows, zoneRows,
+      szRows,  distRows
+    ] = await Promise.all([
       qStats(where, F.sector),
-      qStats(where, `${F.sector},${F.zone},${F.status}`)
+      qStats(where, F.cell),
+      qStats(where, F.village),
+      qStats(where, F.zone),
+      qStats(where, `${F.sector},${F.zone}`),   // sector x zone for table + zone-per-sector
+      qDistinct(F.village, where)               // village count
     ]);
 
-    let total=0, legal=0, illegal=0, existing=0;
-    statusRows.forEach(f => {
-      const v = (f.attributes[F.status]||'').toLowerCase();
-      const c = f.attributes.cnt;
-      total += c;
-      if (v === STATUS.legal.toLowerCase())    legal    += c;
-      else if (v === STATUS.illegal.toLowerCase()) illegal += c;
-      else existing += c;
-    });
+    const total = secRows.reduce((s,f)=>s+f.attributes.cnt,0);
+    const sectorCount  = secRows.length;
+    const zoneCount    = zoneRows.length;
+    const villageCount = distRows.length;
 
-    // Zone count
-    const zones = [...new Set(zoneRows.map(f => f.attributes[F.zone]).filter(Boolean))];
+    // KPIs
+    $('kT').textContent=fmt(total);
+    $('kS').textContent=sectorCount;
+    $('kZ').textContent=zoneCount;
+    $('kV').textContent=villageCount;
+    $('ovMeta').textContent=`${fmt(total)} buildings across ${sectorCount} sectors`;
 
-    renderKPIs(total, legal, existing, zones.length);
-    renderZoneBars(zoneRows, total);
-    renderSectorBars(sectorRows, total);
-    renderSectorCards(sectorRows, total);
+    // Admin area charts
+    const secSorted  = secRows.map(f=>({label:f.attributes[F.sector]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
+    const cellSorted = cellRows.map(f=>({label:f.attributes[F.cell]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
+    const villSorted = villRows.map(f=>({label:f.attributes[F.village]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
+    const zoneSorted = zoneRows.map(f=>({label:f.attributes[F.zone]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
+
+    $('sectTot').textContent=fmt(total);
+    $('cellTot').textContent=fmt(total);
+    $('villTot').textContent=fmt(total);
+    $('zoneTot').textContent=fmt(total);
+    $('areaMeta').textContent=`${sectorCount} sectors · ${cellSorted.length} cells · ${villSorted.length} villages`;
+    $('zoneMeta').textContent=`${zoneCount} zone types`;
+    $('secCardMeta').textContent=`${sectorCount} sectors`;
+
+    $('sectorBars').innerHTML  = buildBars(secSorted,   total, 'sector',  null);
+    $('cellBars').innerHTML    = buildBars(cellSorted,  total, 'cell',    null);
+    $('villageBars').innerHTML = buildBars(villSorted.slice(0,10), total, 'village', null);
+    $('zoneBars').innerHTML    = buildBars(zoneSorted,  total, 'zone',    z=>zc(z));
+
+    // Sector cards
+    renderSectorCards(secSorted, total);
+
+    // Zone per sector (top 6 sectors)
+    renderZonePerSector(szRows, secSorted.slice(0,6), total);
+
+    // Full table
     renderTable(szRows, total);
 
-    $('overviewMeta').textContent = `${fmt(total)} buildings · ${zones.length} zone types`;
-    $('chartsMeta').textContent   = `${zones.length} zones · ${sectorRows.length} sectors`;
-    $('sectorMeta').textContent   = `${sectorRows.length} sectors`;
-    $('tableMeta').textContent    = `${tableRows.length} records`;
-    $('lastUpd').textContent      = new Date().toLocaleString('en-RW',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-
+    $('tableMeta').textContent=`${tableRows.length} records`;
+    $('lastUpd').textContent=new Date().toLocaleString('en-RW',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
     setOv(null);
-  } catch(e) {
-    $('ovTxt').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>${e.message}`;
+
+  }catch(e){
+    $('ovTxt').innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>${e.message}`;
     console.error(e);
   }
 }
 
-async function refresh() {
-  const btn = $('rfBtn');
+async function refresh(){
+  const btn=$('rfBtn');
   btn.classList.add('spin');
   await loadData().catch(()=>{});
   btn.classList.remove('spin');
 }
 
-// ══ RENDERS ══
+// ══ RENDER HELPERS ══
 
-function renderKPIs(total, legal, existing, zones) {
-  $('kT').textContent = fmt(total);
-  $('kL').textContent = fmt(legal);
-  $('kE').textContent = fmt(existing);
-  $('kZ').textContent = zones;
-  $('kLs').textContent = pct(legal, total) + ' of total';
-  $('kEs').textContent = pct(existing, total) + ' of total';
-}
-
-function renderZoneBars(rows, grand) {
-  const byZ = {};
-  rows.forEach(f => { const z = f.attributes[F.zone]||'?'; byZ[z] = (byZ[z]||0) + f.attributes.cnt; });
-  const sorted = Object.entries(byZ).sort((a,b)=>b[1]-a[1]);
-  const max = sorted[0]?.[1]||1;
-  $('zoneTotVal').textContent = fmt(grand);
-
-  $('zoneBars').innerHTML = sorted.map(([code,cnt]) => {
-    const c  = ZONE_COLORS[code]||'#94a3b8';
-    const tc = isLight(code) ? '#0c1420' : 'rgba(255,255,255,.9)';
-    const w  = (cnt/max*100).toFixed(1);
-    return `<div class="bar-row">
-      <span class="bar-label" title="${ZONE_NAMES[code]||code}">${code}</span>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:${w}%;background:${c}">
-          <span style="color:${tc}">${fmt(cnt)}</span>
-        </div>
-      </div>
-      <span class="bar-pct">${pct(cnt,grand)}</span>
-    </div>`;
-  }).join('');
-}
-
-function renderSectorBars(rows, grand) {
-  const sorted = rows.map(f=>({
-    name: f.attributes[F.sector]||'Unknown',
-    cnt:  f.attributes.cnt
-  })).sort((a,b)=>b.cnt-a.cnt);
-  const max = sorted[0]?.cnt||1;
-  $('sectTotVal').textContent = fmt(grand);
-
-  $('sectorBars').innerHTML = sorted.slice(0,10).map(s => {
-    const w = (s.cnt/max*100).toFixed(1);
-    const t = Math.round(50 + (s.cnt/max)*100);
-    return `<div class="bar-row">
-      <span class="bar-label" title="${s.name}">${s.name.slice(0,10)}</span>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:${w}%;background:linear-gradient(90deg,hsl(213,70%,${100-t*0.3}%),hsl(196,80%,${100-t*0.35}%))">
-          <span style="color:rgba(255,255,255,.9)">${fmt(s.cnt)}</span>
-        </div>
-      </div>
-      <span class="bar-pct">${pct(s.cnt,grand)}</span>
-    </div>`;
-  }).join('');
-}
-
-function renderSectorCards(rows, grand) {
-  const sorted = rows.map(f=>({
-    name: f.attributes[F.sector]||'Unknown',
-    cnt:  f.attributes.cnt
-  })).sort((a,b)=>b.cnt-a.cnt);
-  const max = sorted[0]?.cnt||1;
-
-  $('sectorGrid').innerHTML = sorted.map(s => {
-    const w = (s.cnt/max*100).toFixed(1);
-    return `<div class="sector-card" onclick="onSectorCard('${s.name}')">
-      <div class="sc-name">${s.name}</div>
-      <div class="sc-stats">
-        <div>
-          <div class="sc-stat-val">${fmt(s.cnt)}</div>
-          <div class="sc-stat-lbl">Buildings</div>
-        </div>
-        <div>
-          <div class="sc-stat-val" style="color:var(--ink3)">${pct(s.cnt,grand)}</div>
-          <div class="sc-stat-lbl">of total</div>
-        </div>
-      </div>
+function renderSectorCards(sorted, total){
+  const max=sorted[0]?.cnt||1;
+  $('sectorGrid').innerHTML=sorted.map(s=>{
+    const w=(s.cnt/max*100).toFixed(1);
+    const active=filters.sector===s.label?'active':'';
+    return `<div class="sector-card ${active}" onclick="barClick('sector','${s.label.replace(/'/g,"\\'")}')">
+      <div class="sc-name">${s.label}</div>
+      <div class="sc-val">${fmt(s.cnt)}</div>
+      <div class="sc-lbl">Buildings · ${pct(s.cnt,total)}</div>
       <div class="sc-bar"><div class="sc-bar-fill" style="width:${w}%"></div></div>
     </div>`;
   }).join('');
 }
 
-function onSectorCard(name) {
-  filters.sector = name;
-  $('selS').value = name;
-  $('selS').classList.add('on');
-  zoomToSector(name);
-  loadData();
-  // Scroll map into view
-  $('viewDiv').scrollIntoView({ behavior:'smooth', block:'center' });
-}
-
-function renderTable(rows, grand) {
-  const agg = {};
-  rows.forEach(f => {
-    const sec = f.attributes[F.sector]||'Unknown';
-    const z   = f.attributes[F.zone]||'—';
-    const st  = (f.attributes[F.status]||'').toLowerCase();
-    const cnt = f.attributes.cnt||0;
-    const key = `${sec}||${z}`;
-    if (!agg[key]) agg[key] = { sector:sec, zone:z, total:0, legal:0, illegal:0, existing:0 };
-    agg[key].total    += cnt;
-    if (st === STATUS.legal.toLowerCase())    agg[key].legal    += cnt;
-    else if (st === STATUS.illegal.toLowerCase()) agg[key].illegal += cnt;
-    else agg[key].existing += cnt;
+function renderZonePerSector(szRows, topSectors, grandTotal){
+  // Build sector → zone map
+  const bySec={};
+  szRows.forEach(f=>{
+    const sec=f.attributes[F.sector]||'?';
+    const z  =f.attributes[F.zone]||'?';
+    const cnt=f.attributes.cnt||0;
+    if(!bySec[sec]) bySec[sec]={};
+    bySec[sec][z]=(bySec[sec][z]||0)+cnt;
   });
 
-  tableRows = Object.values(agg).sort((a,b) => b.total - a.total);
+  $('zonePerSector').innerHTML=topSectors.map(s=>{
+    const zData=bySec[s.label]||{};
+    const sorted=Object.entries(zData).sort((a,b)=>b[1]-a[1]);
+    const secTotal=sorted.reduce((sum,[,v])=>sum+v,0);
+    const bars=sorted.slice(0,8).map(([z,cnt])=>{
+      const c=zc(z), t=tc(z);
+      const w=(cnt/Math.max(...sorted.map(([,v])=>v))*100).toFixed(1);
+      const active=filters.zone===z?'active':'';
+      return `<div class="bar-row ${active}" onclick="barClick('zone','${z}')">
+        <span class="bar-label">${z}</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${w}%;background:${c}">
+            <span style="color:${t}">${fmt(cnt)}</span>
+          </div>
+        </div>
+        <span class="bar-pct">${pct(cnt,secTotal)}</span>
+      </div>`;
+    }).join('');
 
-  $('tbl').innerHTML = tableRows.map((r,i) => {
-    const c  = ZONE_COLORS[r.zone]||'#94a3b8';
-    const tc = isLight(r.zone) ? '#0c1420' : '#fff';
-    const shareW = grand > 0 ? (r.total/grand*100).toFixed(1) : 0;
-    const isTop = i < 3;
-    return `<tr onclick="onRow('${r.sector}','${r.zone}')">
-      <td><span class="badge ${isTop?'top':''}">${i+1}</span></td>
+    return `<div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">${s.label}</div>
+          <div class="chart-card-sub">${fmt(s.cnt)} buildings total</div>
+        </div>
+        <div>
+          <div class="chart-total-val">${sorted.length}</div>
+          <div class="chart-total-lbl">Zones</div>
+        </div>
+      </div>
+      <div class="bar-list">${bars}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderTable(szRows, grandTotal){
+  const agg={};
+  szRows.forEach(f=>{
+    const sec=f.attributes[F.sector]||'Unknown';
+    const z  =f.attributes[F.zone]||'—';
+    const cnt=f.attributes.cnt||0;
+    const key=`${sec}||${z}`;
+    if(!agg[key]) agg[key]={sector:sec,zone:z,cnt:0};
+    agg[key].cnt+=cnt;
+  });
+
+  tableRows=Object.values(agg).sort((a,b)=>b.cnt-a.cnt);
+
+  if(!tableRows.length){
+    $('tbl').innerHTML=`<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--ink3)">No records match current filters</td></tr>`;
+    return;
+  }
+
+  $('tbl').innerHTML=tableRows.map((r,i)=>{
+    const c=zc(r.zone), t=isL(r.zone)?'#0c1420':'#fff';
+    const shareW=grandTotal>0?(r.cnt/grandTotal*100).toFixed(1):0;
+    return `<tr onclick="onTableRow('${r.sector.replace(/'/g,"\\'")}','${r.zone}')">
+      <td><span class="badge ${i<3?'top':''}">${i+1}</span></td>
       <td>${r.sector}</td>
-      <td><span class="chip" style="background:${c};color:${tc}">${r.zone}</span></td>
-      <td style="color:var(--ink3);font-size:11px">${(ZONE_NAMES[r.zone]||r.zone)}</td>
-      <td style="font-family:var(--mono);font-weight:500">${fmt(r.total)}</td>
-      <td style="font-family:var(--mono);color:var(--green)">${fmt(r.legal)}</td>
-      <td style="font-family:var(--mono);color:var(--amber)">${fmt(r.existing)}</td>
+      <td><span class="chip" style="background:${c};color:${t}">${r.zone}</span></td>
+      <td style="font-size:11px;color:var(--ink3)">${ZONE_NAMES[r.zone]||r.zone}</td>
+      <td style="font-family:var(--mono);font-weight:500">${fmt(r.cnt)}</td>
       <td>
         <div class="mini-bar-wrap">
           <div class="mini-bar"><div class="mini-bar-fill" style="width:${shareW}%;background:${c}"></div></div>
-          <span style="font-family:var(--mono);font-size:9px;color:var(--ink3)">${pct(r.total,grand)}</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--ink3)">${pct(r.cnt,grandTotal)}</span>
         </div>
       </td>
     </tr>`;
   }).join('');
 }
 
-function onRow(sector, zone) {
-  filters.sector = sector;
-  $('selS').value = sector;
-  $('selS').classList.add('on');
-  if (zone && zone !== '—') {
-    filters.zone = zone;
-    document.querySelectorAll('.zc').forEach(b => b.classList.toggle('on', b.dataset.z === zone));
-  }
-  zoomToSector(sector);
+function onTableRow(sector,zone){
+  filters.sector=sector; $('selS').value=sector; $('selS').classList.add('on');
+  if(zone&&zone!=='—'){ filters.zone=zone; document.querySelectorAll('.zc').forEach(b=>b.classList.toggle('on',b.dataset.z===zone)); }
+  zoomTo(sector);
   loadData();
-  $('viewDiv').scrollIntoView({ behavior:'smooth', block:'center' });
+  $('viewDiv').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
-function downloadCSV() {
-  if (!tableRows.length) return;
-  const hdr = ['Sector','Zone Code','Zone Type','Total','Legal','Illegal','Existing'];
-  const body = tableRows.map(r => [r.sector,r.zone,ZONE_NAMES[r.zone]||r.zone,r.total,r.legal,r.illegal,r.existing]);
-  const csv  = [hdr,...body].map(row=>row.map(v=>`"${v}"`).join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download = `Rubavu_Buildings_${new Date().toISOString().slice(0,10)}.csv`;
+function downloadCSV(){
+  if(!tableRows.length) return;
+  const hdr=['Sector','Zone Code','Zone Type','Total Buildings','Share of Total'];
+  const grand=tableRows.reduce((s,r)=>s+r.cnt,0);
+  const body=tableRows.map(r=>[r.sector,r.zone,ZONE_NAMES[r.zone]||r.zone,r.cnt,pct(r.cnt,grand)]);
+  const csv=[hdr,...body].map(row=>row.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`Rubavu_Buildings_Zoning_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
 }
 
-// ══ INIT
-loadFilters().then(() => loadData()).catch(e => {
-  $('ovTxt').textContent = '⚠ ' + e.message;
-});
+// ── INIT
+loadFilters().then(()=>loadData()).catch(e=>{ $('ovTxt').textContent=e.message; });
 </script>
 </body>
 </html>
-
-
