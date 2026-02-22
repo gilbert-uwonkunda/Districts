@@ -142,16 +142,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-
 .two-col.wide{grid-template-columns:3fr 2fr;}
 .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 
+/* ── CANVAS TOOLTIP ── */
+.cv-tt{position:absolute;pointer-events:none;background:var(--ink);color:#fff;padding:7px 11px;border-radius:7px;font-family:var(--mono);font-size:11px;line-height:1.5;white-space:nowrap;z-index:50;box-shadow:0 4px 14px rgba(0,0,0,.25);}
+.cv-tt::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-bottom:none;border-top-color:var(--ink);}
+
 /* ── GROUPED ZONE BAR (stacked segments per row) ── */
 .grp-list{display:flex;flex-direction:column;gap:5px;}
 .grp-row{display:flex;align-items:center;gap:8px;padding:3px 6px;border-radius:6px;cursor:default;transition:background .15s;}
 .grp-row:hover{background:var(--bg);}
 .grp-label{width:80px;font-size:11px;color:var(--ink2);text-align:right;flex-shrink:0;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.grp-track{flex:1;height:24px;display:flex;border-radius:4px;overflow:hidden;background:var(--bg);}
-.grp-seg{height:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:filter .15s;min-width:0;overflow:hidden;position:relative;}
-.grp-seg:hover{filter:brightness(1.1);}
-.grp-seg.active-seg{outline:2px solid rgba(0,0,0,.4);outline-offset:-2px;}
-.grp-seg span{font-family:var(--mono);font-size:9px;font-weight:700;white-space:nowrap;overflow:hidden;padding:0 4px;}
 .grp-total{width:44px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;color:var(--ink2);flex-shrink:0;}
 .sector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
 .sector-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);transition:all .2s;cursor:pointer;}
@@ -411,45 +410,54 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
     <div class="chart-card" style="margin-bottom:14px">
       <div class="chart-card-head">
         <div>
-          <div class="chart-card-title">Zone Distribution by Sector</div>
-          <div class="chart-card-sub">Each row is a sector · bars coloured by zone code · click to filter</div>
+          <div class="chart-card-title">Total Buildings by Zoning — Per Sector</div>
+          <div class="chart-card-sub">Hover to inspect · click any bar to filter by sector</div>
         </div>
         <div>
           <div class="chart-total-val" id="zbsTot">—</div>
           <div class="chart-total-lbl">Buildings</div>
         </div>
       </div>
-      <div id="zoneBySector"></div>
+      <div style="position:relative">
+        <canvas id="cvsSector" style="width:100%;display:block"></canvas>
+        <div id="ttSector" class="cv-tt" style="display:none"></div>
+      </div>
     </div>
 
     <!-- Zone by Cell -->
     <div class="chart-card" style="margin-bottom:14px">
       <div class="chart-card-head">
         <div>
-          <div class="chart-card-title">Zone Distribution by Cell</div>
-          <div class="chart-card-sub">Each row is a cell · bars coloured by zone code · click to filter</div>
+          <div class="chart-card-title">Total Buildings by Zoning — Per Cell</div>
+          <div class="chart-card-sub">Hover to inspect · click any bar to filter by cell</div>
         </div>
         <div>
           <div class="chart-total-val" id="zbcTot">—</div>
           <div class="chart-total-lbl">Buildings</div>
         </div>
       </div>
-      <div id="zoneByCell"></div>
+      <div style="position:relative">
+        <canvas id="cvsCell" style="width:100%;display:block"></canvas>
+        <div id="ttCell" class="cv-tt" style="display:none"></div>
+      </div>
     </div>
 
     <!-- Zone by Village -->
     <div class="chart-card">
       <div class="chart-card-head">
         <div>
-          <div class="chart-card-title">Zone Distribution by Village</div>
-          <div class="chart-card-sub">Top 15 villages · bars coloured by zone code · click to filter</div>
+          <div class="chart-card-title">Total Buildings by Zoning — Per Village</div>
+          <div class="chart-card-sub">Top 20 villages · hover to inspect · click to filter</div>
         </div>
         <div>
           <div class="chart-total-val" id="zbvTot">—</div>
           <div class="chart-total-lbl">Buildings</div>
         </div>
       </div>
-      <div id="zoneByVillage"></div>
+      <div style="position:relative">
+        <canvas id="cvsVillage" style="width:100%;display:block"></canvas>
+        <div id="ttVillage" class="cv-tt" style="display:none"></div>
+      </div>
     </div>
 
   </div>
@@ -793,9 +801,9 @@ async function loadData(){
       qStats(where, `${F.village},${F.zone}`)
     ]);
 
-    renderGroupedZone('zoneBySector',  sczRows, F.sector,  'zbsTot', total, secSorted.map(s=>s.label));
-    renderGroupedZone('zoneByCell',    czRows,  F.cell,    'zbcTot', total, cellSorted.map(s=>s.label));
-    renderGroupedZone('zoneByVillage', vzRows,  F.village, 'zbvTot', total, villSorted.slice(0,15).map(s=>s.label));
+    renderGroupedZone('cvsSector',  'ttSector',  sczRows, F.sector,  'zbsTot', total, secSorted.map(s=>s.label));
+    renderGroupedZone('cvsCell',    'ttCell',    czRows,  F.cell,    'zbcTot', total, cellSorted.map(s=>s.label));
+    renderGroupedZone('cvsVillage', 'ttVillage', vzRows,  F.village, 'zbvTot', total, villSorted.slice(0,20).map(s=>s.label));
 
     // Full table
     renderTable(szRows, total);
@@ -816,59 +824,157 @@ async function refresh(){
   btn.classList.remove('spin');
 }
 
-// ══ RENDER HELPERS ══
+// ══ CANVAS STACKED BAR CHART ══
+// canvasId, tooltipId, rows, areaField, totId, grandTotal, orderedAreas
+function renderGroupedZone(canvasId, ttId, rows, areaField, totId, grandTotal, orderedAreas){
 
-// Grouped stacked bar: each row = one area value, segments = zone codes
-function renderGroupedZone(containerId, rows, areaField, totId, grandTotal, orderedAreas){
-  // Aggregate: area → zone → cnt
+  // ── Aggregate data
   const byArea={};
   rows.forEach(f=>{
-    const area=f.attributes[areaField]||'?';
-    const z   =f.attributes[F.zone]||'?';
-    const cnt =f.attributes.cnt||0;
+    const area=f.attributes[areaField];
+    if(!area||area==='blank'||area==='?'||area==='') return;
+    const z=f.attributes[F.zone]||'?';
+    const cnt=f.attributes.cnt||0;
     if(!byArea[area]) byArea[area]={total:0,zones:{}};
     byArea[area].total+=cnt;
     byArea[area].zones[z]=(byArea[area].zones[z]||0)+cnt;
   });
 
-  // Order rows by provided sort, fall back to all areas desc
-  const areas = orderedAreas.length
-    ? orderedAreas.filter(a=>byArea[a])
-    : Object.keys(byArea).sort((a,b)=>byArea[b].total-byArea[a].total);
-
+  const areas=orderedAreas.filter(a=>byArea[a]);
   $(totId).textContent=fmt(grandTotal);
+  if(!areas.length) return;
 
-  // Collect all zone codes present, sorted by total desc
+  // ── Zone order: sort by grand total across all areas
   const zTotals={};
   rows.forEach(f=>{ const z=f.attributes[F.zone]||'?'; zTotals[z]=(zTotals[z]||0)+(f.attributes.cnt||0); });
   const allZones=Object.keys(zTotals).sort((a,b)=>zTotals[b]-zTotals[a]);
 
-  $(containerId).innerHTML=`<div class="grp-list">`+areas.map(area=>{
+  // ── Canvas setup
+  const canvas=$(canvasId);
+  const dpr=window.devicePixelRatio||1;
+  const MARGIN={top:24, right:20, bottom:56, left:52};
+  const BAR_W=Math.max(28, Math.min(64, Math.floor((canvas.parentElement.offsetWidth - MARGIN.left - MARGIN.right) / areas.length) - 6));
+  const CHART_W=canvas.parentElement.offsetWidth||900;
+  const CHART_H=320;
+
+  canvas.width=CHART_W*dpr;
+  canvas.height=CHART_H*dpr;
+  canvas.style.width=CHART_W+'px';
+  canvas.style.height=CHART_H+'px';
+
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const plotW=CHART_W-MARGIN.left-MARGIN.right;
+  const plotH=CHART_H-MARGIN.top-MARGIN.bottom;
+
+  // ── Y axis scale
+  const maxVal=Math.max(...areas.map(a=>byArea[a].total));
+  const yTick=niceStep(maxVal,5);
+  const yMax=Math.ceil(maxVal/yTick)*yTick;
+
+  function yPx(v){ return MARGIN.top + plotH - (v/yMax)*plotH; }
+  function fmtK(v){ return v>=1000?(v/1000).toFixed(v%1000===0?0:1)+'k':String(v); }
+
+  // ── Draw gridlines + y labels
+  ctx.font=`11px DM Mono, monospace`;
+  ctx.textAlign='right';
+  ctx.fillStyle='#8e9aac';
+  for(let v=0;v<=yMax;v+=yTick){
+    const y=yPx(v);
+    ctx.strokeStyle=v===0?'#cdd3e0':'#e8eaf0';
+    ctx.lineWidth=v===0?1.5:.8;
+    ctx.beginPath(); ctx.moveTo(MARGIN.left,y); ctx.lineTo(MARGIN.left+plotW,y); ctx.stroke();
+    ctx.fillText(fmtK(v),MARGIN.left-8,y+4);
+  }
+
+  // ── Bar spacing
+  const totalBarsW=BAR_W*areas.length;
+  const gap=(plotW-totalBarsW)/(areas.length+1);
+
+  // ── Store hit regions for interaction
+  const hitMap=[];
+
+  // ── Draw bars
+  areas.forEach((area,i)=>{
     const d=byArea[area];
-    const rowTotal=d.total;
-    const segs=allZones.filter(z=>d.zones[z]).map(z=>{
+    const x=MARGIN.left+gap+(BAR_W+gap)*i;
+    let stackY=yPx(0);
+
+    allZones.filter(z=>d.zones[z]).forEach(z=>{
       const cnt=d.zones[z];
-      const w=(cnt/rowTotal*100).toFixed(2);
-      const c=zc(z), t=tc(z);
-      const active=filters.zone===z?'active-seg':'';
-      return `<div class="grp-seg ${active}" style="width:${w}%;background:${c};min-width:${cnt/rowTotal>0.04?'0':'0'}px"
-        onclick="event.stopPropagation();barClick('zone','${z}')"
-        title="${z}: ${fmt(cnt)} buildings">
-        ${cnt/rowTotal>0.07?`<span style="color:${t}">${z}</span>`:''}
-      </div>`;
-    }).join('');
-    const areaActive=(
-      (areaField===F.sector  && filters.sector===area)||
-      (areaField===F.cell    && filters.cell===area)||
-      (areaField===F.village && filters.village===area)
-    );
-    const typeMap={[F.sector]:'sector',[F.cell]:'cell',[F.village]:'village'};
-    return `<div class="grp-row" onclick="barClick('${typeMap[areaField]}','${area.replace(/'/g,"\\'")}')">
-      <span class="grp-label ${areaActive?'font-weight:700':''}" title="${area}">${area.slice(0,12)}</span>
-      <div class="grp-track">${segs}</div>
-      <span class="grp-total">${fmt(rowTotal)}</span>
-    </div>`;
-  }).join('')+`</div>`;
+      const segH=(cnt/yMax)*plotH;
+      const sy=stackY-segH;
+
+      ctx.fillStyle=zc(z);
+      ctx.beginPath();
+      ctx.roundRect(x, sy, BAR_W, segH, z===allZones.filter(zz=>d.zones[zz]).at(-1)?[3,3,0,0]:[0]);
+      ctx.fill();
+
+      hitMap.push({x, y:sy, w:BAR_W, h:segH, area, zone:z, cnt});
+      stackY=sy;
+    });
+
+    // ── X label
+    ctx.save();
+    ctx.translate(x+BAR_W/2, CHART_H-MARGIN.bottom+14);
+    ctx.rotate(-Math.PI/4);
+    ctx.textAlign='right';
+    ctx.font=`500 11px Bricolage Grotesque, sans-serif`;
+    ctx.fillStyle=area===filters[areaField==='sector'?'sector':areaField==='cell'?'cell':'village']?'#1a56db':'#47566b';
+    ctx.fillText(area.length>12?area.slice(0,11)+'…':area, 0, 0);
+    ctx.restore();
+  });
+
+  // ── Tooltip
+  const tt=$(ttId);
+
+  function onMove(e){
+    const rect=canvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left);
+    const my=(e.clientY-rect.top);
+    const hit=hitMap.find(r=>mx>=r.x&&mx<=r.x+r.w&&my>=r.y&&my<=r.y+r.h);
+    if(hit){
+      canvas.style.cursor='pointer';
+      tt.style.display='block';
+      tt.innerHTML=`<strong>${hit.area}</strong><br>${hit.zone} · ${fmt(hit.cnt)} buildings`;
+      const tx=hit.x+hit.w/2;
+      const ty=hit.y-8;
+      tt.style.left=(tx-tt.offsetWidth/2)+'px';
+      tt.style.top=(ty-tt.offsetHeight)+'px';
+    } else {
+      canvas.style.cursor='default';
+      tt.style.display='none';
+    }
+  }
+
+  function onClick(e){
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    const hit=hitMap.find(r=>mx>=r.x&&mx<=r.x+r.w&&my>=r.y&&my<=r.y+r.h);
+    if(!hit) return;
+    const typeMap={'sector':'sector','cell':'cell','village':'village'};
+    const fType=areaField===F.sector?'sector':areaField===F.cell?'cell':'village';
+    barClick(fType, hit.area);
+  }
+
+  // Remove old listeners cleanly
+  canvas._onMove && canvas.removeEventListener('mousemove', canvas._onMove);
+  canvas._onClick && canvas.removeEventListener('click', canvas._onClick);
+  canvas._onLeave && canvas.removeEventListener('mouseleave', canvas._onLeave);
+  canvas._onMove=onMove; canvas._onClick=onClick;
+  canvas._onLeave=()=>{ tt.style.display='none'; canvas.style.cursor='default'; };
+  canvas.addEventListener('mousemove', canvas._onMove);
+  canvas.addEventListener('click', canvas._onClick);
+  canvas.addEventListener('mouseleave', canvas._onLeave);
+}
+
+function niceStep(maxVal, targetTicks){
+  const rough=maxVal/targetTicks;
+  const mag=Math.pow(10,Math.floor(Math.log10(rough)));
+  const residual=rough/mag;
+  let nice=residual<1.5?1:residual<3?2:residual<7?5:10;
+  return nice*mag;
 }
 
 function renderTable(szRows, grandTotal){
