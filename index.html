@@ -773,9 +773,13 @@ body {
 
   <!-- AUTH PANEL — shown if token needed -->
   <div class="auth-panel" id="authPanel">
-    <span class="auth-label">🔐 Enterprise token required:</span>
-    <input class="auth-input" type="password" id="tokenInput" placeholder="Paste your ArcGIS token here…" />
-    <button class="auth-btn" onclick="applyToken()">Connect</button>
+    <span class="auth-label">🔐 Enterprise login required:</span>
+    <input class="auth-input" type="text"     id="userInput"  placeholder="Username" style="max-width:160px"/>
+    <input class="auth-input" type="password" id="passInput"  placeholder="Password" style="max-width:160px"/>
+    <button class="auth-btn" onclick="loginWithCredentials()">Sign In</button>
+    <span style="color:var(--text3);font-size:11px;margin:0 4px">or</span>
+    <input class="auth-input" type="password" id="tokenInput" placeholder="Paste token directly…" />
+    <button class="auth-btn" style="background:var(--border-h);color:var(--text)" onclick="applyToken()">Use Token</button>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -982,7 +986,11 @@ body {
 // ══════════════════════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════════════════════
-const SERVICE_URL = 'https://gh.space.gov.rw/server/rest/services/Rubavu_Buildings/FeatureServer/1';
+const SERVICE_URL   = 'https://gh.space.gov.rw/server/rest/services/Rubavu_Buildings/FeatureServer/1';
+const TOKEN_URL     = 'https://gh.space.gov.rw/portal/sharing/rest/generateToken';
+// ── Set credentials below OR leave blank to use the manual token input ──
+const AUTO_USER     = '';   // e.g. 'svc_dashboard'
+const AUTO_PASS     = '';   // e.g. 'yourpassword'
 
 const FIELDS = {
   status:   'legal_t',
@@ -1036,6 +1044,25 @@ const ZONE_COLORS = {
 };
 
 let TOKEN = '';
+
+// ══════════════════════════════════════════════════════════
+// TOKEN GENERATION
+// ══════════════════════════════════════════════════════════
+async function generateToken(username, password) {
+  const params = new URLSearchParams({
+    username,
+    password,
+    client:     'referer',
+    referer:    window.location.origin || 'https://gilbert-uwonkunda.github.io',
+    expiration: '120',
+    f:          'json'
+  });
+  const res  = await fetch(TOKEN_URL, { method: 'POST', body: params });
+  const json = await res.json();
+  if (json.error) throw new Error('Auth failed: ' + json.error.message);
+  if (!json.token) throw new Error('No token returned from portal');
+  return json.token;
+}
 
 // ══════════════════════════════════════════════════════════
 // UTILITIES
@@ -1130,6 +1157,17 @@ async function loadAll() {
   btn.classList.add('spinning');
 
   try {
+    // ── 0. Auto-generate token if credentials provided
+    if (!TOKEN && AUTO_USER && AUTO_PASS) {
+      try {
+        TOKEN = await generateToken(AUTO_USER, AUTO_PASS);
+        el('authPanel').classList.remove('visible');
+      } catch(authErr) {
+        // Fall through to manual token input
+        TOKEN = '';
+      }
+    }
+
     // ── 1. Total count
     const total = await queryCount('1=1');
 
@@ -1176,6 +1214,7 @@ async function loadAll() {
 
 function retryLoad() {
   hideError();
+  TOKEN = '';
   loadAll();
 }
 
@@ -1184,6 +1223,21 @@ function applyToken() {
   if (TOKEN) {
     el('authPanel').classList.remove('visible');
     loadAll();
+  }
+}
+
+async function loginWithCredentials() {
+  const user = el('userInput').value.trim();
+  const pass = el('passInput').value.trim();
+  if (!user || !pass) return;
+  try {
+    showLoading(true);
+    TOKEN = await generateToken(user, pass);
+    el('authPanel').classList.remove('visible');
+    loadAll();
+  } catch(err) {
+    showLoading(false);
+    showError('Login failed: ' + err.message);
   }
 }
 
@@ -1450,8 +1504,11 @@ function gradientShade(val, max) {
 }
 
 // ══════════════════════════════════════════════════════════
-// INIT
+// INIT — show auth panel immediately if no credentials set
 // ══════════════════════════════════════════════════════════
+if (!AUTO_USER) {
+  el('authPanel').classList.add('visible');
+}
 loadAll();
 </script>
 </body>
