@@ -700,33 +700,45 @@ async function loadData(){
     ]);
 
     const total = secRows.reduce((s,f)=>s+f.attributes.cnt,0);
-    const sectorCount  = secRows.length;
-    const zoneCount    = zoneRows.length;
-    const villageCount = distRows.length;
 
-    // KPIs
+    // KPIs — all from clean arrays (computed below after null filter)
+
+
+    const NULL_VALS = new Set(['', '?', 'null', 'blank', 'unknown', 'undefined']);
+    const clean = v => v && !NULL_VALS.has(String(v).toLowerCase().trim());
+
+    // Admin area charts — nulls excluded first, then count from clean arrays
+    const secSorted  = secRows.filter(f=>clean(f.attributes[F.sector])).map(f=>({label:f.attributes[F.sector],cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
+    const cellSorted = cellRows.filter(f=>clean(f.attributes[F.cell])).map(f=>({label:f.attributes[F.cell],cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
+    const villSorted = villRows.filter(f=>clean(f.attributes[F.village])).map(f=>({label:f.attributes[F.village],cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
+    const zoneSorted = zoneRows.map(f=>({label:f.attributes[F.zone]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
+
+    // Counts derived from clean arrays
+    const sectorCount  = secSorted.length;
+    const zoneCount    = zoneRows.length;
+    const villageCount = villSorted.length;
+
+    // Totals per admin level (sum of cleaned rows)
+    const secTotal  = secSorted.reduce((s,r)=>s+r.cnt,0);
+    const cellTotal = cellSorted.reduce((s,r)=>s+r.cnt,0);
+    const villTotal = villSorted.reduce((s,r)=>s+r.cnt,0);
+
+    // KPIs — from clean arrays
     $('kT').textContent=fmt(total);
     $('kS').textContent=sectorCount;
     $('kZ').textContent=zoneCount;
     $('kV').textContent=villageCount;
     $('ovMeta').textContent=`${fmt(total)} buildings across ${sectorCount} sectors`;
 
-    // Admin area charts
-    const secSorted  = secRows.map(f=>({label:f.attributes[F.sector]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
-    const cellSorted = cellRows.map(f=>({label:f.attributes[F.cell]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
-    const villSorted = villRows.map(f=>({label:f.attributes[F.village]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
-    const zoneSorted = zoneRows.map(f=>({label:f.attributes[F.zone]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
-
     $('zoneTot').textContent=fmt(total);
-    $('adminTot').textContent=fmt(total);
     $('areaMeta').textContent=`${sectorCount} sectors · ${cellSorted.length} cells · ${villSorted.length} villages`;
     $('zoneMeta').textContent=`${zoneCount} zone types`;
 
-    // Store admin area data for tab switching
+    // Store admin area data — include per-level total for the card header
     window._adminData = {
-      sector:  { items: secSorted,              type: 'sector'  },
-      cell:    { items: cellSorted,             type: 'cell'    },
-      village: { items: villSorted,             type: 'village' }
+      sector:  { items: secSorted,  type: 'sector',  tot: secTotal  },
+      cell:    { items: cellSorted, type: 'cell',    tot: cellTotal },
+      village: { items: villSorted, type: 'village', tot: villTotal }
     };
     window._adminTotal = total;
 
@@ -801,7 +813,8 @@ function renderAdminTab(){
   const items = _adminExpanded ? d.items : d.items.slice(0, 20);
   const lblMap = {sector:'Sector', cell:'Cell', village:'Village'};
   $('adminLbl').textContent = lblMap[_adminTab] + ' · Buildings';
-  $('adminBars').innerHTML = buildBars(items, window._adminTotal, d.type, null);
+  $('adminTot').textContent = fmt(d.tot);
+  $('adminBars').innerHTML = buildBars(items, d.tot, d.type, null);
 }
 
 // ── Zone-by-area stacked canvas chart (Section 6)
