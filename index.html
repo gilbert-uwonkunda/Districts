@@ -259,6 +259,10 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
       <span class="fb-sel-label">Village</span>
       <select class="fsel" id="selV" onchange="onF('village',this.value)"><option value="">All</option></select>
     </div>
+    <div class="fb-group">
+      <span class="fb-sel-label">Zoning</span>
+      <select class="fsel" id="selZoning" onchange="onF('zoning',this.value)"><option value="">All</option></select>
+    </div>
     <div class="fb-divider"></div>
     <div class="fb-zone-chips" id="zoneChips"></div>
     <button class="clr-all-btn" onclick="clearAll()">
@@ -366,22 +370,14 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
       <span class="section-meta" id="zoneMeta">—</span>
     </div>
     <div class="chart-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
-        <div class="tab-bar" id="zoneTabs">
-          <button class="tab-btn active" onclick="switchZoneTab('zone')">All Zones</button>
-          <button class="tab-btn" onclick="switchZoneTab('sector')">Per Sector</button>
-          <button class="tab-btn" onclick="switchZoneTab('cell')">Per Cell</button>
-          <button class="tab-btn" onclick="switchZoneTab('village')">Per Village</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;">
+        <div>
+          <div class="chart-card-title">Total Buildings per Zone Code</div>
+          <div class="chart-card-sub">Click any zone to filter · zone codes coloured by masterplan classification</div>
         </div>
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="text-align:right">
-            <div class="chart-total-val" id="zoneTot">—</div>
-            <div class="chart-total-lbl" id="zoneLbl">Total Buildings</div>
-          </div>
-          <button class="expand-btn" id="zoneExpandBtn" onclick="toggleZoneExpand()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-            Show all
-          </button>
+        <div style="text-align:right">
+          <div class="chart-total-val" id="zoneTot">—</div>
+          <div class="chart-total-lbl">Total Buildings</div>
         </div>
       </div>
       <div class="bar-list" id="zoneBars"></div>
@@ -469,7 +465,7 @@ const SVC    = 'https://gh.space.gov.rw/server/rest/services/Rubavu_Buildings/Fe
 const PORTAL = 'https://gh.space.gov.rw/portal';
 const WEBMAP = '4cf12c58e97f4dcf9d4ffd524e085303';
 
-const F = { zone:'zone_code', sector:'sector', cell:'cell', village:'village' };
+const F = { zone:'zone_code', sector:'sector', cell:'cell', village:'village', zoning:'zoning' };
 
 const ZONE_COLORS = {
   'R1A':'#ffec18','R1B':'#ffebb0','R2':'#ffbb36','R3':'#ff7f00','R4':'#ff5a25','R1':'#ffe97a',
@@ -496,7 +492,7 @@ const ZONE_NAMES = {
 const LIGHT_Z = new Set(['R1A','R1B','R2','R1','T1','T2','PF5','PF6']);
 
 // ── State
-let filters = { sector:'', cell:'', village:'', zone:'' };
+let filters = { sector:'', cell:'', village:'', zone:'', zoning:'' };
 let tableRows = [];
 let mapView=null, flayer=null;
 
@@ -515,6 +511,7 @@ function buildWhere(){
   if(filters.sector)  p.push(`${F.sector}='${filters.sector.replace(/'/g,"''")}'`);
   if(filters.cell)    p.push(`${F.cell}='${filters.cell.replace(/'/g,"''")}'`);
   if(filters.village) p.push(`${F.village}='${filters.village.replace(/'/g,"''")}'`);
+  if(filters.zoning)  p.push(`${F.zoning}='${filters.zoning.replace(/'/g,"''")}'`);
   if(filters.zone)    p.push(`${F.zone}='${filters.zone.replace(/'/g,"''")}'`);
   return p.length ? p.join(' AND ') : '1=1';
 }
@@ -591,12 +588,13 @@ function highlightZone(z){
 // FILTERS INIT
 // ══════════════════════════════════
 async function loadFilters(){
-  const [sectors,cells,villages,zones]=await Promise.all([
-    qDistinct(F.sector),qDistinct(F.cell),qDistinct(F.village),qDistinct(F.zone)
+  const [sectors,cells,villages,zones,zonings]=await Promise.all([
+    qDistinct(F.sector),qDistinct(F.cell),qDistinct(F.village),qDistinct(F.zone),qDistinct(F.zoning)
   ]);
   populateSel('selS',sectors,'All');
   populateSel('selC',cells,'All');
   populateSel('selV',villages,'All');
+  populateSel('selZoning',zonings,'All');
   buildChips(zones);
 }
 
@@ -616,8 +614,8 @@ function buildChips(zones){
 // ── Filter handlers
 function onF(type,val){
   filters[type]=val;
-  const sel={sector:'selS',cell:'selC',village:'selV'}[type];
-  $(sel).classList.toggle('on',!!val);
+  const sel={sector:'selS',cell:'selC',village:'selV',zoning:'selZoning'}[type];
+  if(sel) $(sel).classList.toggle('on',!!val);
   if(type==='sector'&&val) zoomTo(val);
   loadData();
 }
@@ -630,15 +628,15 @@ function onZone(z){
 
 function clearF(type){
   filters[type]='';
-  const sel={sector:'selS',cell:'selC',village:'selV'}[type];
+  const sel={sector:'selS',cell:'selC',village:'selV',zoning:'selZoning'}[type];
   if(sel){ $(sel).value=''; $(sel).classList.remove('on'); }
   if(type==='zone') document.querySelectorAll('.zc').forEach(b=>b.classList.remove('on'));
   loadData();
 }
 
 function clearAll(){
-  filters={sector:'',cell:'',village:'',zone:''};
-  ['selS','selC','selV'].forEach(id=>{ $(id).value=''; $(id).classList.remove('on'); });
+  filters={sector:'',cell:'',village:'',zone:'',zoning:''};
+  ['selS','selC','selV','selZoning'].forEach(id=>{ $(id).value=''; $(id).classList.remove('on'); });
   document.querySelectorAll('.zc').forEach(b=>b.classList.remove('on'));
   $('actTags').innerHTML='';
   applyDef('1=1');
@@ -650,6 +648,7 @@ function renderTags(){
   if(filters.sector)  tags.push({k:'sector', l:'Sector: '+filters.sector});
   if(filters.cell)    tags.push({k:'cell',   l:'Cell: '+filters.cell});
   if(filters.village) tags.push({k:'village',l:'Village: '+filters.village});
+  if(filters.zoning)  tags.push({k:'zoning', l:'Zoning: '+filters.zoning});
   if(filters.zone)    tags.push({k:'zone',   l:'Zone: '+filters.zone});
   $('actTags').innerHTML=tags.map(t=>
     `<span class="tag">${t.l}<button onclick="clearF('${t.k}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>`
@@ -757,40 +756,28 @@ async function loadData(){
     };
     window._adminTotal = total;
 
-    // Store zone bar data for tab switching (zone tab + per-area tabs)
-    // per-area needs sector×zone etc — loaded below
-    window._zoneSimple = zoneSorted;
-    window._zoneTotal  = total;
-
-    // Zone split by sector, cell, village (need extra queries)
+    // Zone split by sector, cell, village (for canvas stacked charts)
     const [sczRows, czRows, vzRows] = await Promise.all([
       qStats(where, `${F.sector},${F.zone}`),
       qStats(where, `${F.cell},${F.zone}`),
       qStats(where, `${F.village},${F.zone}`)
     ]);
 
-    // Store chart data for zone-by-area tab switching
+    // Store chart data for zone-by-area canvas tab switching
     window._chartData = {
       sector:  { rows: sczRows, field: F.sector,  areas: secSorted.map(s=>s.label)  },
       cell:    { rows: czRows,  field: F.cell,    areas: cellSorted.map(s=>s.label) },
       village: { rows: vzRows,  field: F.village, areas: villSorted.map(s=>s.label) }
     };
     window._chartTotal = total;
-
-    // Also wire zone-per-area data into the zoning card tabs
-    window._zoneData = {
-      zone:    null, // uses _zoneSimple
-      sector:  { rows: sczRows, field: F.sector,  areas: secSorted.map(s=>s.label)  },
-      cell:    { rows: czRows,  field: F.cell,    areas: cellSorted.map(s=>s.label) },
-      village: { rows: vzRows,  field: F.village, areas: villSorted.map(s=>s.label) }
-    };
-
     $('zbTot').textContent = fmt(total);
 
-    // Render all three tabbed cards
+    // Render all tabbed cards
     renderAdminTab();
-    renderZoneTab();
     renderActiveTab();
+
+    // Zone bars — direct render, no tabs
+    $('zoneBars').innerHTML = buildBars(zoneSorted, total, 'zone', z => zc(z));
 
     // Full table
     renderTable(szRows, total);
@@ -841,62 +828,6 @@ function renderAdminTab(){
   const lblMap = {sector:'Sector', cell:'Cell', village:'Village'};
   $('adminLbl').textContent = lblMap[_adminTab] + ' · Buildings';
   $('adminBars').innerHTML = buildBars(items, window._adminTotal, d.type, null);
-}
-
-// ── Zone Classification card (All Zones / Per Sector / Per Cell / Per Village)
-let _zoneTab      = 'zone';
-let _zoneExpanded = false;
-
-function switchZoneTab(tab){
-  _zoneTab = tab;
-  document.querySelectorAll('#zoneTabs .tab-btn').forEach(b =>
-    b.classList.toggle('active',
-      (tab==='zone'    && b.textContent==='All Zones')  ||
-      (tab==='sector'  && b.textContent==='Per Sector') ||
-      (tab==='cell'    && b.textContent==='Per Cell')   ||
-      (tab==='village' && b.textContent==='Per Village')
-    )
-  );
-  renderZoneTab();
-}
-
-function toggleZoneExpand(){
-  _zoneExpanded = !_zoneExpanded;
-  const btn = $('zoneExpandBtn');
-  btn.innerHTML = _zoneExpanded
-    ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3v3a2 2 0 01-2 2H3M21 8h-3a2 2 0 01-2-2V3M3 16h3a2 2 0 012 2v3M16 21v-3a2 2 0 012-2h3"/></svg> Collapse`
-    : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg> Show all`;
-  renderZoneTab();
-}
-
-function renderZoneTab(){
-  if(!window._zoneSimple) return;
-  const total = window._zoneTotal;
-
-  if(_zoneTab === 'zone'){
-    // Simple horizontal bars by zone code — no expand needed (zones are finite)
-    const items = _zoneExpanded ? window._zoneSimple : window._zoneSimple.slice(0, 20);
-    $('zoneLbl').textContent = 'Zone Codes · Buildings';
-    $('zoneBars').innerHTML = buildBars(items, total, 'zone', z => zc(z));
-  } else {
-    // Aggregated totals per area — use pre-grouped data
-    const d = window._zoneData[_zoneTab];
-    if(!d) return;
-    // Sum per area from rows
-    const byArea = {};
-    d.rows.forEach(f => {
-      const area = f.attributes[d.field];
-      if(!area || area === 'blank' || area === '?' || area === '') return;
-      byArea[area] = (byArea[area]||0) + (f.attributes.cnt||0);
-    });
-    const sorted = d.areas
-      .filter(a => byArea[a])
-      .map(a => ({label: a, cnt: byArea[a]}));
-    const items = _zoneExpanded ? sorted : sorted.slice(0, 20);
-    const lblMap = {sector:'Sector', cell:'Cell', village:'Village'};
-    $('zoneLbl').textContent = lblMap[_zoneTab] + ' · Buildings';
-    $('zoneBars').innerHTML = buildBars(items, total, _zoneTab, null);
-  }
 }
 
 // ── Zone-by-area stacked canvas chart (Section 6)
@@ -955,21 +886,10 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
   const wrap=$('chartWrap');
   const dpr=window.devicePixelRatio||1;
   const MARGIN={top:24, right:20, bottom:62, left:52};
-  const BAR_W=Math.max(20, Math.min(60, 44));
-  const GAP=8;
   const CHART_H=340;
 
-  // Width: enough to fit all bars or container width, whichever is bigger
-  const minW=MARGIN.left+MARGIN.right+(BAR_W+GAP)*validAreas.length+GAP;
   const containerW=wrap.offsetWidth||900;
-  const CHART_W=Math.max(containerW, minW);
-
-  // If all bars fit in container, no overflow scroll needed
-  if(CHART_W<=containerW){
-    wrap.style.overflowX='visible';
-  } else {
-    wrap.style.overflowX='auto';
-  }
+  const CHART_W=containerW;
 
   canvas.width=CHART_W*dpr;
   canvas.height=CHART_H*dpr;
@@ -981,6 +901,27 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
 
   const plotW=CHART_W-MARGIN.left-MARGIN.right;
   const plotH=CHART_H-MARGIN.top-MARGIN.bottom;
+
+  // Bar sizing: distribute bars evenly to fill full plot width
+  const GAP    = Math.max(3, Math.min(8, Math.floor(plotW / (validAreas.length * 5))));
+  const BAR_W  = Math.max(6, Math.floor((plotW - GAP * (validAreas.length + 1)) / validAreas.length));
+  const startX = MARGIN.left + GAP;
+
+  // If expanded and bars would be too narrow, enable horizontal scroll
+  const neededW = MARGIN.left + MARGIN.right + (BAR_W + GAP) * validAreas.length + GAP;
+  if(neededW > containerW){
+    wrap.style.overflowX='auto';
+    // Recalculate with minimum bar width for legibility
+    const minBarW = 28;
+    const expandedW = MARGIN.left + MARGIN.right + (minBarW + GAP) * validAreas.length + GAP;
+    canvas.width = expandedW * dpr;
+    canvas.style.width = expandedW + 'px';
+  } else {
+    wrap.style.overflowX='hidden';
+  }
+
+  const hitMap=[];
+  const fType=areaField===F.sector?'sector':areaField===F.cell?'cell':'village';
 
   // Y scale
   const maxVal=Math.max(...validAreas.map(a=>byArea[a].total));
@@ -1001,13 +942,6 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
     ctx.beginPath(); ctx.moveTo(MARGIN.left,y); ctx.lineTo(MARGIN.left+plotW,y); ctx.stroke();
     ctx.fillText(fmtK(v),MARGIN.left-8,y+4);
   }
-
-  // Bar x positions: evenly spaced across plotW
-  const totalBarsW=(BAR_W+GAP)*validAreas.length-GAP;
-  const startX=MARGIN.left+(plotW-totalBarsW)/2;
-
-  const hitMap=[];
-  const fType=areaField===F.sector?'sector':areaField===F.cell?'cell':'village';
 
   validAreas.forEach((area,i)=>{
     const d=byArea[area];
@@ -1142,14 +1076,15 @@ function onTableRow(sector,zone){
 
 function downloadCSV(){
   if(!tableRows.length) return;
-  const hdr=['Sector','Zone Code','Zone Type','Total Buildings','Share of Total'];
-  const grand=tableRows.reduce((s,r)=>s+r.cnt,0);
-  const body=tableRows.map(r=>[r.sector,r.zone,ZONE_NAMES[r.zone]||r.zone,r.cnt,pct(r.cnt,grand)]);
+  const hdr=['Sector','Zone Code','Zone Type','Total Buildings'];
+  const body=tableRows.map(r=>[r.sector,r.zone,ZONE_NAMES[r.zone]||r.zone,r.cnt]);
   const csv=[hdr,...body].map(row=>row.map(v=>`"${v}"`).join(',')).join('\n');
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
   a.download=`Rubavu_Buildings_Zoning_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
 }
 
 // ── INIT
