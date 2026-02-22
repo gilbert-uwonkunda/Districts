@@ -988,6 +988,7 @@ body {
 // ══════════════════════════════════════════════════════════
 const SERVICE_URL   = 'https://gh.space.gov.rw/server/rest/services/Rubavu_Buildings/FeatureServer/1';
 const TOKEN_URL     = 'https://gh.space.gov.rw/portal/sharing/rest/generateToken';
+const PORTAL_URL    = 'https://gh.space.gov.rw/portal';
 // ── Set credentials below OR leave blank to use the manual token input ──
 const AUTO_USER     = '';   // e.g. 'svc_dashboard'
 const AUTO_PASS     = '';   // e.g. 'yourpassword'
@@ -1049,11 +1050,14 @@ let TOKEN = '';
 // TOKEN GENERATION
 // ══════════════════════════════════════════════════════════
 async function generateToken(username, password) {
+  const referer = window.location.hostname.includes('github.io')
+    ? 'https://gilbert-uwonkunda.github.io'
+    : PORTAL_URL;
   const params = new URLSearchParams({
     username,
     password,
     client:     'referer',
-    referer:    window.location.origin || 'https://gilbert-uwonkunda.github.io',
+    referer:    referer,
     expiration: '120',
     f:          'json'
   });
