@@ -135,14 +135,24 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-
 .bar-track{flex:1;height:24px;background:var(--bg);border-radius:4px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;min-width:40px;transition:width .55s cubic-bezier(.4,0,.2,1);}
 .bar-fill span{font-family:var(--mono);font-size:10px;font-weight:700;}
-.bar-pct{width:36px;text-align:right;font-family:var(--mono);font-size:10px;color:var(--ink3);flex-shrink:0;}
+.bar-pct{display:none;}
 
 /* ── TWO / THREE COL ── */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .two-col.wide{grid-template-columns:3fr 2fr;}
 .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 
-/* ── SECTOR CARDS ── */
+/* ── GROUPED ZONE BAR (stacked segments per row) ── */
+.grp-list{display:flex;flex-direction:column;gap:5px;}
+.grp-row{display:flex;align-items:center;gap:8px;padding:3px 6px;border-radius:6px;cursor:default;transition:background .15s;}
+.grp-row:hover{background:var(--bg);}
+.grp-label{width:80px;font-size:11px;color:var(--ink2);text-align:right;flex-shrink:0;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.grp-track{flex:1;height:24px;display:flex;border-radius:4px;overflow:hidden;background:var(--bg);}
+.grp-seg{height:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:filter .15s;min-width:0;overflow:hidden;position:relative;}
+.grp-seg:hover{filter:brightness(1.1);}
+.grp-seg.active-seg{outline:2px solid rgba(0,0,0,.4);outline-offset:-2px;}
+.grp-seg span{font-family:var(--mono);font-size:9px;font-weight:700;white-space:nowrap;overflow:hidden;padding:0 4px;}
+.grp-total{width:44px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;color:var(--ink2);flex-shrink:0;}
 .sector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
 .sector-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);transition:all .2s;cursor:pointer;}
 .sector-card:hover{box-shadow:var(--shadow-md);border-color:var(--blue);transform:translateY(-2px);}
@@ -212,17 +222,9 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
         Western Province · Rwanda
       </div>
       <h1 class="rh-title">Rubavu District<br><span>Building &amp; Zoning</span> Statistics</h1>
-      <p class="rh-sub">Total building distribution and masterplan zoning analysis across sectors, cells, and villages. Data sourced directly from ArcGIS Enterprise.</p>
+      <p class="rh-sub">Total building distribution and masterplan zoning analysis across sectors, cells, and villages of Rubavu District.</p>
     </div>
     <div class="rh-meta">
-      <div class="meta-item">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Updated <span id="lastUpd" style="color:var(--ink2);margin-left:4px">—</span>
-      </div>
-      <div class="meta-item">
-        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        ArcGIS Enterprise
-      </div>
       <button class="refresh-btn" id="rfBtn" onclick="refresh()">
         <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
         Refresh Data
@@ -310,7 +312,7 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
       <div class="map-toolbar">
         <div class="map-toolbar-title">
           <svg viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
-          Rubavu District
+          Rubavu District — Building Footprints
         </div>
         <div class="map-toolbar-hint">
           <svg viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg>
@@ -398,22 +400,58 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
     </div>
   </div>
 
-  <!-- SECTION 5 — SECTOR CARDS -->
-  <div class="section fade-up d5">
-    <div class="section-head">
-      <span class="section-title">Sector Overview</span>
-      <span class="section-meta" id="secCardMeta">—</span>
-    </div>
-    <div class="sector-grid" id="sectorGrid"></div>
-  </div>
-
-  <!-- SECTION 6 — ZONING PER SECTOR (top 5 sectors) -->
+  <!-- SECTION 6 — ZONING SPLIT BY AREA -->
   <div class="section fade-up d6">
     <div class="section-head">
-      <span class="section-title">Zoning Distribution per Sector</span>
-      <span class="section-meta">Top 6 sectors · Click any bar to filter</span>
+      <span class="section-title">Zoning Distribution by Area</span>
+      <span class="section-meta">Zone codes split across sectors, cells and villages · Click any bar to filter</span>
     </div>
-    <div class="three-col" id="zonePerSector"></div>
+
+    <!-- Zone by Sector -->
+    <div class="chart-card" style="margin-bottom:14px">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Zone Distribution by Sector</div>
+          <div class="chart-card-sub">Each row is a sector · bars coloured by zone code · click to filter</div>
+        </div>
+        <div>
+          <div class="chart-total-val" id="zbsTot">—</div>
+          <div class="chart-total-lbl">Buildings</div>
+        </div>
+      </div>
+      <div id="zoneBySector"></div>
+    </div>
+
+    <!-- Zone by Cell -->
+    <div class="chart-card" style="margin-bottom:14px">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Zone Distribution by Cell</div>
+          <div class="chart-card-sub">Each row is a cell · bars coloured by zone code · click to filter</div>
+        </div>
+        <div>
+          <div class="chart-total-val" id="zbcTot">—</div>
+          <div class="chart-total-lbl">Buildings</div>
+        </div>
+      </div>
+      <div id="zoneByCell"></div>
+    </div>
+
+    <!-- Zone by Village -->
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">Zone Distribution by Village</div>
+          <div class="chart-card-sub">Top 15 villages · bars coloured by zone code · click to filter</div>
+        </div>
+        <div>
+          <div class="chart-total-val" id="zbvTot">—</div>
+          <div class="chart-total-lbl">Buildings</div>
+        </div>
+      </div>
+      <div id="zoneByVillage"></div>
+    </div>
+
   </div>
 
   <!-- SECTION 7 — FULL TABLE -->
@@ -674,7 +712,7 @@ function buildBars(items, total, onClickFn, colorFn){
           <span style="color:${textCol}">${fmt(item.cnt)}</span>
         </div>
       </div>
-      <span class="bar-pct">${pct(item.cnt,total)}</span>
+      <span class="bar-pct"></span>
     </div>`;
   }).join('');
 }
@@ -742,24 +780,27 @@ async function loadData(){
     $('zoneTot').textContent=fmt(total);
     $('areaMeta').textContent=`${sectorCount} sectors · ${cellSorted.length} cells · ${villSorted.length} villages`;
     $('zoneMeta').textContent=`${zoneCount} zone types`;
-    $('secCardMeta').textContent=`${sectorCount} sectors`;
 
     $('sectorBars').innerHTML  = buildBars(secSorted,   total, 'sector',  null);
     $('cellBars').innerHTML    = buildBars(cellSorted,  total, 'cell',    null);
     $('villageBars').innerHTML = buildBars(villSorted.slice(0,10), total, 'village', null);
     $('zoneBars').innerHTML    = buildBars(zoneSorted,  total, 'zone',    z=>zc(z));
 
-    // Sector cards
-    renderSectorCards(secSorted, total);
+    // Zone split by sector, cell, village (need extra queries)
+    const [sczRows, czRows, vzRows] = await Promise.all([
+      qStats(where, `${F.sector},${F.zone}`),
+      qStats(where, `${F.cell},${F.zone}`),
+      qStats(where, `${F.village},${F.zone}`)
+    ]);
 
-    // Zone per sector (top 6 sectors)
-    renderZonePerSector(szRows, secSorted.slice(0,6), total);
+    renderGroupedZone('zoneBySector',  sczRows, F.sector,  'zbsTot', total, secSorted.map(s=>s.label));
+    renderGroupedZone('zoneByCell',    czRows,  F.cell,    'zbcTot', total, cellSorted.map(s=>s.label));
+    renderGroupedZone('zoneByVillage', vzRows,  F.village, 'zbvTot', total, villSorted.slice(0,15).map(s=>s.label));
 
     // Full table
     renderTable(szRows, total);
 
     $('tableMeta').textContent=`${tableRows.length} records`;
-    $('lastUpd').textContent=new Date().toLocaleString('en-RW',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
     setOv(null);
 
   }catch(e){
@@ -777,64 +818,57 @@ async function refresh(){
 
 // ══ RENDER HELPERS ══
 
-function renderSectorCards(sorted, total){
-  const max=sorted[0]?.cnt||1;
-  $('sectorGrid').innerHTML=sorted.map(s=>{
-    const w=(s.cnt/max*100).toFixed(1);
-    const active=filters.sector===s.label?'active':'';
-    return `<div class="sector-card ${active}" onclick="barClick('sector','${s.label.replace(/'/g,"\\'")}')">
-      <div class="sc-name">${s.label}</div>
-      <div class="sc-val">${fmt(s.cnt)}</div>
-      <div class="sc-lbl">Buildings · ${pct(s.cnt,total)}</div>
-      <div class="sc-bar"><div class="sc-bar-fill" style="width:${w}%"></div></div>
-    </div>`;
-  }).join('');
-}
-
-function renderZonePerSector(szRows, topSectors, grandTotal){
-  // Build sector → zone map
-  const bySec={};
-  szRows.forEach(f=>{
-    const sec=f.attributes[F.sector]||'?';
-    const z  =f.attributes[F.zone]||'?';
-    const cnt=f.attributes.cnt||0;
-    if(!bySec[sec]) bySec[sec]={};
-    bySec[sec][z]=(bySec[sec][z]||0)+cnt;
+// Grouped stacked bar: each row = one area value, segments = zone codes
+function renderGroupedZone(containerId, rows, areaField, totId, grandTotal, orderedAreas){
+  // Aggregate: area → zone → cnt
+  const byArea={};
+  rows.forEach(f=>{
+    const area=f.attributes[areaField]||'?';
+    const z   =f.attributes[F.zone]||'?';
+    const cnt =f.attributes.cnt||0;
+    if(!byArea[area]) byArea[area]={total:0,zones:{}};
+    byArea[area].total+=cnt;
+    byArea[area].zones[z]=(byArea[area].zones[z]||0)+cnt;
   });
 
-  $('zonePerSector').innerHTML=topSectors.map(s=>{
-    const zData=bySec[s.label]||{};
-    const sorted=Object.entries(zData).sort((a,b)=>b[1]-a[1]);
-    const secTotal=sorted.reduce((sum,[,v])=>sum+v,0);
-    const bars=sorted.slice(0,8).map(([z,cnt])=>{
+  // Order rows by provided sort, fall back to all areas desc
+  const areas = orderedAreas.length
+    ? orderedAreas.filter(a=>byArea[a])
+    : Object.keys(byArea).sort((a,b)=>byArea[b].total-byArea[a].total);
+
+  $(totId).textContent=fmt(grandTotal);
+
+  // Collect all zone codes present, sorted by total desc
+  const zTotals={};
+  rows.forEach(f=>{ const z=f.attributes[F.zone]||'?'; zTotals[z]=(zTotals[z]||0)+(f.attributes.cnt||0); });
+  const allZones=Object.keys(zTotals).sort((a,b)=>zTotals[b]-zTotals[a]);
+
+  $(containerId).innerHTML=`<div class="grp-list">`+areas.map(area=>{
+    const d=byArea[area];
+    const rowTotal=d.total;
+    const segs=allZones.filter(z=>d.zones[z]).map(z=>{
+      const cnt=d.zones[z];
+      const w=(cnt/rowTotal*100).toFixed(2);
       const c=zc(z), t=tc(z);
-      const w=(cnt/Math.max(...sorted.map(([,v])=>v))*100).toFixed(1);
-      const active=filters.zone===z?'active':'';
-      return `<div class="bar-row ${active}" onclick="barClick('zone','${z}')">
-        <span class="bar-label">${z}</span>
-        <div class="bar-track">
-          <div class="bar-fill" style="width:${w}%;background:${c}">
-            <span style="color:${t}">${fmt(cnt)}</span>
-          </div>
-        </div>
-        <span class="bar-pct">${pct(cnt,secTotal)}</span>
+      const active=filters.zone===z?'active-seg':'';
+      return `<div class="grp-seg ${active}" style="width:${w}%;background:${c};min-width:${cnt/rowTotal>0.04?'0':'0'}px"
+        onclick="event.stopPropagation();barClick('zone','${z}')"
+        title="${z}: ${fmt(cnt)} buildings">
+        ${cnt/rowTotal>0.07?`<span style="color:${t}">${z}</span>`:''}
       </div>`;
     }).join('');
-
-    return `<div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">${s.label}</div>
-          <div class="chart-card-sub">${fmt(s.cnt)} buildings total</div>
-        </div>
-        <div>
-          <div class="chart-total-val">${sorted.length}</div>
-          <div class="chart-total-lbl">Zones</div>
-        </div>
-      </div>
-      <div class="bar-list">${bars}</div>
+    const areaActive=(
+      (areaField===F.sector  && filters.sector===area)||
+      (areaField===F.cell    && filters.cell===area)||
+      (areaField===F.village && filters.village===area)
+    );
+    const typeMap={[F.sector]:'sector',[F.cell]:'cell',[F.village]:'village'};
+    return `<div class="grp-row" onclick="barClick('${typeMap[areaField]}','${area.replace(/'/g,"\\'")}')">
+      <span class="grp-label ${areaActive?'font-weight:700':''}" title="${area}">${area.slice(0,12)}</span>
+      <div class="grp-track">${segs}</div>
+      <span class="grp-total">${fmt(rowTotal)}</span>
     </div>`;
-  }).join('');
+  }).join('')+`</div>`;
 }
 
 function renderTable(szRows, grandTotal){
@@ -867,7 +901,6 @@ function renderTable(szRows, grandTotal){
       <td>
         <div class="mini-bar-wrap">
           <div class="mini-bar"><div class="mini-bar-fill" style="width:${shareW}%;background:${c}"></div></div>
-          <span style="font-family:var(--mono);font-size:9px;color:var(--ink3)">${pct(r.cnt,grandTotal)}</span>
         </div>
       </td>
     </tr>`;
@@ -899,4 +932,3 @@ loadFilters().then(()=>loadData()).catch(e=>{ $('ovTxt').textContent=e.message; 
 </script>
 </body>
 </html>
-
