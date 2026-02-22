@@ -331,59 +331,31 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
     </div>
   </div>
 
-  <!-- SECTION 3 — BUILDINGS BY SECTOR / CELL / VILLAGE -->
+  <!-- SECTION 3 — BUILDINGS BY ADMINISTRATIVE AREA -->
   <div class="section fade-up d4">
     <div class="section-head">
       <span class="section-title">Buildings by Administrative Area</span>
       <span class="section-meta" id="areaMeta">—</span>
     </div>
-    <div class="three-col">
-
-      <!-- By Sector -->
-      <div class="chart-card">
-        <div class="chart-card-head">
-          <div>
-            <div class="chart-card-title">By Sector</div>
-            <div class="chart-card-sub">Click a bar to filter</div>
-          </div>
-          <div>
-            <div class="chart-total-val" id="sectTot">—</div>
-            <div class="chart-total-lbl">Total</div>
-          </div>
+    <div class="chart-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+        <div class="tab-bar" id="adminTabs">
+          <button class="tab-btn active" onclick="switchAdminTab('sector')">Sector</button>
+          <button class="tab-btn" onclick="switchAdminTab('cell')">Cell</button>
+          <button class="tab-btn" onclick="switchAdminTab('village')">Village</button>
         </div>
-        <div class="bar-list" id="sectorBars"></div>
-      </div>
-
-      <!-- By Cell -->
-      <div class="chart-card">
-        <div class="chart-card-head">
-          <div>
-            <div class="chart-card-title">By Cell</div>
-            <div class="chart-card-sub">Click a bar to filter</div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="text-align:right">
+            <div class="chart-total-val" id="adminTot">—</div>
+            <div class="chart-total-lbl" id="adminLbl">Buildings</div>
           </div>
-          <div>
-            <div class="chart-total-val" id="cellTot">—</div>
-            <div class="chart-total-lbl">Total</div>
-          </div>
+          <button class="expand-btn" id="adminExpandBtn" onclick="toggleAdminExpand()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            Show all
+          </button>
         </div>
-        <div class="bar-list" id="cellBars"></div>
       </div>
-
-      <!-- By Village -->
-      <div class="chart-card">
-        <div class="chart-card-head">
-          <div>
-            <div class="chart-card-title">By Village</div>
-            <div class="chart-card-sub">Top 10 · Click to filter</div>
-          </div>
-          <div>
-            <div class="chart-total-val" id="villTot">—</div>
-            <div class="chart-total-lbl">Total</div>
-          </div>
-        </div>
-        <div class="bar-list" id="villageBars"></div>
-      </div>
-
+      <div class="bar-list" id="adminBars"></div>
     </div>
   </div>
 
@@ -394,14 +366,22 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
       <span class="section-meta" id="zoneMeta">—</span>
     </div>
     <div class="chart-card">
-      <div class="chart-card-head">
-        <div>
-          <div class="chart-card-title">Total Buildings per Zone Code</div>
-          <div class="chart-card-sub">Distribution across masterplan zoning classifications · Click any zone to filter</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+        <div class="tab-bar" id="zoneTabs">
+          <button class="tab-btn active" onclick="switchZoneTab('zone')">All Zones</button>
+          <button class="tab-btn" onclick="switchZoneTab('sector')">Per Sector</button>
+          <button class="tab-btn" onclick="switchZoneTab('cell')">Per Cell</button>
+          <button class="tab-btn" onclick="switchZoneTab('village')">Per Village</button>
         </div>
-        <div>
-          <div class="chart-total-val" id="zoneTot">—</div>
-          <div class="chart-total-lbl">Total Buildings</div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="text-align:right">
+            <div class="chart-total-val" id="zoneTot">—</div>
+            <div class="chart-total-lbl" id="zoneLbl">Total Buildings</div>
+          </div>
+          <button class="expand-btn" id="zoneExpandBtn" onclick="toggleZoneExpand()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            Show all
+          </button>
         </div>
       </div>
       <div class="bar-list" id="zoneBars"></div>
@@ -764,17 +744,23 @@ async function loadData(){
     const villSorted = villRows.map(f=>({label:f.attributes[F.village]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
     const zoneSorted = zoneRows.map(f=>({label:f.attributes[F.zone]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
 
-    $('sectTot').textContent=fmt(total);
-    $('cellTot').textContent=fmt(total);
-    $('villTot').textContent=fmt(total);
     $('zoneTot').textContent=fmt(total);
+    $('adminTot').textContent=fmt(total);
     $('areaMeta').textContent=`${sectorCount} sectors · ${cellSorted.length} cells · ${villSorted.length} villages`;
     $('zoneMeta').textContent=`${zoneCount} zone types`;
 
-    $('sectorBars').innerHTML  = buildBars(secSorted,   total, 'sector',  null);
-    $('cellBars').innerHTML    = buildBars(cellSorted,  total, 'cell',    null);
-    $('villageBars').innerHTML = buildBars(villSorted.slice(0,10), total, 'village', null);
-    $('zoneBars').innerHTML    = buildBars(zoneSorted,  total, 'zone',    z=>zc(z));
+    // Store admin area data for tab switching
+    window._adminData = {
+      sector:  { items: secSorted,              type: 'sector'  },
+      cell:    { items: cellSorted,             type: 'cell'    },
+      village: { items: villSorted,             type: 'village' }
+    };
+    window._adminTotal = total;
+
+    // Store zone bar data for tab switching (zone tab + per-area tabs)
+    // per-area needs sector×zone etc — loaded below
+    window._zoneSimple = zoneSorted;
+    window._zoneTotal  = total;
 
     // Zone split by sector, cell, village (need extra queries)
     const [sczRows, czRows, vzRows] = await Promise.all([
@@ -783,16 +769,27 @@ async function loadData(){
       qStats(where, `${F.village},${F.zone}`)
     ]);
 
-    // Store chart data for tab switching
+    // Store chart data for zone-by-area tab switching
     window._chartData = {
-      sector: { rows: sczRows, field: F.sector, areas: secSorted.map(s=>s.label) },
-      cell:   { rows: czRows,  field: F.cell,   areas: cellSorted.map(s=>s.label) },
-      village:{ rows: vzRows,  field: F.village, areas: villSorted.map(s=>s.label) }
+      sector:  { rows: sczRows, field: F.sector,  areas: secSorted.map(s=>s.label)  },
+      cell:    { rows: czRows,  field: F.cell,    areas: cellSorted.map(s=>s.label) },
+      village: { rows: vzRows,  field: F.village, areas: villSorted.map(s=>s.label) }
     };
     window._chartTotal = total;
+
+    // Also wire zone-per-area data into the zoning card tabs
+    window._zoneData = {
+      zone:    null, // uses _zoneSimple
+      sector:  { rows: sczRows, field: F.sector,  areas: secSorted.map(s=>s.label)  },
+      cell:    { rows: czRows,  field: F.cell,    areas: cellSorted.map(s=>s.label) },
+      village: { rows: vzRows,  field: F.village, areas: villSorted.map(s=>s.label) }
+    };
+
     $('zbTot').textContent = fmt(total);
 
-    // Render active tab
+    // Render all three tabbed cards
+    renderAdminTab();
+    renderZoneTab();
     renderActiveTab();
 
     // Full table
@@ -814,7 +811,95 @@ async function refresh(){
   btn.classList.remove('spin');
 }
 
-// ══ TAB + EXPAND CONTROLS ══
+// ══ TAB + EXPAND CONTROLLERS ══
+
+// ── Admin Area card (Sector / Cell / Village simple bars)
+let _adminTab      = 'sector';
+let _adminExpanded = false;
+
+function switchAdminTab(tab){
+  _adminTab = tab;
+  document.querySelectorAll('#adminTabs .tab-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent.toLowerCase() === tab)
+  );
+  renderAdminTab();
+}
+
+function toggleAdminExpand(){
+  _adminExpanded = !_adminExpanded;
+  const btn = $('adminExpandBtn');
+  btn.innerHTML = _adminExpanded
+    ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3v3a2 2 0 01-2 2H3M21 8h-3a2 2 0 01-2-2V3M3 16h3a2 2 0 012 2v3M16 21v-3a2 2 0 012-2h3"/></svg> Collapse`
+    : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg> Show all`;
+  renderAdminTab();
+}
+
+function renderAdminTab(){
+  if(!window._adminData) return;
+  const d = window._adminData[_adminTab];
+  const items = _adminExpanded ? d.items : d.items.slice(0, 20);
+  const lblMap = {sector:'Sector', cell:'Cell', village:'Village'};
+  $('adminLbl').textContent = lblMap[_adminTab] + ' · Buildings';
+  $('adminBars').innerHTML = buildBars(items, window._adminTotal, d.type, null);
+}
+
+// ── Zone Classification card (All Zones / Per Sector / Per Cell / Per Village)
+let _zoneTab      = 'zone';
+let _zoneExpanded = false;
+
+function switchZoneTab(tab){
+  _zoneTab = tab;
+  document.querySelectorAll('#zoneTabs .tab-btn').forEach(b =>
+    b.classList.toggle('active',
+      (tab==='zone'    && b.textContent==='All Zones')  ||
+      (tab==='sector'  && b.textContent==='Per Sector') ||
+      (tab==='cell'    && b.textContent==='Per Cell')   ||
+      (tab==='village' && b.textContent==='Per Village')
+    )
+  );
+  renderZoneTab();
+}
+
+function toggleZoneExpand(){
+  _zoneExpanded = !_zoneExpanded;
+  const btn = $('zoneExpandBtn');
+  btn.innerHTML = _zoneExpanded
+    ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3v3a2 2 0 01-2 2H3M21 8h-3a2 2 0 01-2-2V3M3 16h3a2 2 0 012 2v3M16 21v-3a2 2 0 012-2h3"/></svg> Collapse`
+    : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg> Show all`;
+  renderZoneTab();
+}
+
+function renderZoneTab(){
+  if(!window._zoneSimple) return;
+  const total = window._zoneTotal;
+
+  if(_zoneTab === 'zone'){
+    // Simple horizontal bars by zone code — no expand needed (zones are finite)
+    const items = _zoneExpanded ? window._zoneSimple : window._zoneSimple.slice(0, 20);
+    $('zoneLbl').textContent = 'Zone Codes · Buildings';
+    $('zoneBars').innerHTML = buildBars(items, total, 'zone', z => zc(z));
+  } else {
+    // Aggregated totals per area — use pre-grouped data
+    const d = window._zoneData[_zoneTab];
+    if(!d) return;
+    // Sum per area from rows
+    const byArea = {};
+    d.rows.forEach(f => {
+      const area = f.attributes[d.field];
+      if(!area || area === 'blank' || area === '?' || area === '') return;
+      byArea[area] = (byArea[area]||0) + (f.attributes.cnt||0);
+    });
+    const sorted = d.areas
+      .filter(a => byArea[a])
+      .map(a => ({label: a, cnt: byArea[a]}));
+    const items = _zoneExpanded ? sorted : sorted.slice(0, 20);
+    const lblMap = {sector:'Sector', cell:'Cell', village:'Village'};
+    $('zoneLbl').textContent = lblMap[_zoneTab] + ' · Buildings';
+    $('zoneBars').innerHTML = buildBars(items, total, _zoneTab, null);
+  }
+}
+
+// ── Zone-by-area stacked canvas chart (Section 6)
 let _activeTab = 'sector';
 let _expanded  = false;
 
