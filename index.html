@@ -258,6 +258,13 @@ body{
 .kpi-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);font-weight:700;margin-bottom:4px;}
 .kpi-val{font-family:var(--mono);font-size:19px;font-weight:500;color:var(--kc);line-height:1;}
 .kpi-sub{font-size:9px;color:var(--ink3);margin-top:3px;}
+.kpi-icon{
+  width:26px;height:26px;border-radius:6px;
+  background:rgba(0,0,0,.04);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px;
+  color:var(--kc);
+}
 
 /* Zone bars */
 .zbar-sec{
@@ -409,7 +416,10 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
   <!-- LEFT — FILTERS -->
   <aside class="filters">
     <div class="panel-hd">
-      <div class="panel-hd-title">Filters</div>
+      <div class="panel-hd-title" style="display:flex;align-items:center;gap:6px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filters
+      </div>
       <div class="panel-hd-sub">Drill into specific areas</div>
       <div class="active-tags" id="actTags"></div>
     </div>
@@ -445,14 +455,20 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
     </div>
 
     <div class="filters-foot">
-      <button class="clr-all" onclick="clearAll()">✕ &nbsp;Clear All Filters</button>
+      <button class="clr-all" onclick="clearAll()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        &nbsp;Clear All Filters
+      </button>
     </div>
   </aside>
 
   <!-- CENTER — MAP -->
   <div class="map-wrap">
     <div id="viewDiv"></div>
-    <div class="map-chip" id="mapChip">Click a building to filter by sector</div>
+    <div class="map-chip" id="mapChip">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:5px"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg>
+      Click a building to filter by sector
+    </div>
     <div class="map-info" id="mapInfo">
       <strong id="miName">—</strong>
       <span id="miDetail">—</span>
@@ -465,16 +481,25 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
     <!-- KPIs -->
     <div class="kpi-strip">
       <div class="kpi b anim d1">
+        <div class="kpi-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
         <div class="kpi-lbl">Total</div>
         <div class="kpi-val" id="kT">—</div>
         <div class="kpi-sub">Buildings</div>
       </div>
       <div class="kpi g anim d2">
+        <div class="kpi-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
         <div class="kpi-lbl">Legal</div>
         <div class="kpi-val" id="kL">—</div>
         <div class="kpi-sub" id="kLs">—</div>
       </div>
       <div class="kpi a anim d3">
+        <div class="kpi-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
         <div class="kpi-lbl">Existing</div>
         <div class="kpi-val" id="kE">—</div>
         <div class="kpi-sub" id="kEs">—</div>
@@ -766,7 +791,7 @@ function renderTags(){
   if(filters.village) tags.push({k:'village',l:'Village: '+filters.village});
   if(filters.zone)    tags.push({k:'zone',   l:'Zone: '+filters.zone});
   $('actTags').innerHTML = tags.map(t=>
-    `<span class="tag">${t.l}<button onclick="clearF('${t.k}')">×</button></span>`
+    `<span class="tag">${t.l}<button onclick="clearF('${t.k}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>`
   ).join('');
 }
 
@@ -802,7 +827,7 @@ async function loadData(){
     renderTable(sZoneRows);
     setOv(null);
   }catch(e){
-    $('ovTxt').textContent='⚠ '+e.message;
+    $('ovTxt').innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'+e.message;
     console.error(e);
   }
 }
@@ -873,8 +898,8 @@ function renderTable(rows){
   if(!tableRows.length){
     $('tbl').innerHTML=`<tr><td colspan="5">
       <div class="empty">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        No records match
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        No records match current filters
       </div>
     </td></tr>`;
     return;
