@@ -74,10 +74,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-
 .fsel{padding:6px 28px 6px 10px;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%238e9aac' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--ink);font-family:var(--font);font-size:12px;outline:none;cursor:pointer;appearance:none;transition:border-color .15s;min-width:130px;}
 .fsel:focus{border-color:var(--blue);}
 .fsel.on{border-color:var(--blue);background-color:var(--blue-lt);color:var(--blue);font-weight:600;}
-.fb-zone-chips{display:flex;flex-wrap:wrap;gap:4px;flex:1;}
-.zc{padding:3px 9px;border-radius:4px;font-family:var(--mono);font-size:9px;font-weight:700;cursor:pointer;border:1.5px solid transparent;transition:all .15s;opacity:.75;}
-.zc:hover{opacity:1;transform:translateY(-1px);}
-.zc.on{opacity:1;border-color:rgba(0,0,0,.3);box-shadow:0 0 0 2px rgba(0,0,0,.08);}
 .clr-all-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:none;border:1.5px solid var(--border2);border-radius:var(--r-sm);color:var(--ink2);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;flex-shrink:0;}
 .clr-all-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-lt);}
 .clr-all-btn svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;}
@@ -263,8 +259,6 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
       <span class="fb-sel-label">Zoning</span>
       <select class="fsel" id="selZoning" onchange="onF('zoning',this.value)"><option value="">All</option></select>
     </div>
-    <div class="fb-divider"></div>
-    <div class="fb-zone-chips" id="zoneChips"></div>
     <button class="clr-all-btn" onclick="clearAll()">
       <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
       Clear all
@@ -581,34 +575,24 @@ function applyDef(w){ if(window._def) _def(w); }
 
 function highlightZone(z){
   filters.zone=z;
-  document.querySelectorAll('.zc').forEach(b=>b.classList.toggle('on',b.dataset.z===z));
 }
 
 // ══════════════════════════════════
 // FILTERS INIT
 // ══════════════════════════════════
 async function loadFilters(){
-  const [sectors,cells,villages,zones,zonings]=await Promise.all([
-    qDistinct(F.sector),qDistinct(F.cell),qDistinct(F.village),qDistinct(F.zone),qDistinct(F.zoning)
+  const [sectors,cells,villages,zonings]=await Promise.all([
+    qDistinct(F.sector),qDistinct(F.cell),qDistinct(F.village),qDistinct(F.zoning)
   ]);
   populateSel('selS',sectors,'All');
   populateSel('selC',cells,'All');
   populateSel('selV',villages,'All');
   populateSel('selZoning',zonings,'All');
-  buildChips(zones);
 }
 
 function populateSel(id,vals,ph){
   const s=$(id); s.innerHTML=`<option value="">${ph}</option>`;
   vals.forEach(v=>{ const o=document.createElement('option'); o.value=o.textContent=v; s.appendChild(o); });
-}
-
-function buildChips(zones){
-  $('zoneChips').innerHTML=zones.map(z=>{
-    const c=zc(z), t=isL(z)?'#0c1420':'#fff';
-    return `<button class="zc" data-z="${z}" style="background:${c};color:${t}"
-      onclick="onZone('${z}')" title="${ZONE_NAMES[z]||z}">${z}</button>`;
-  }).join('');
 }
 
 // ── Filter handlers
@@ -620,24 +604,16 @@ function onF(type,val){
   loadData();
 }
 
-function onZone(z){
-  filters.zone=filters.zone===z?'':z;
-  document.querySelectorAll('.zc').forEach(b=>b.classList.toggle('on',b.dataset.z===filters.zone));
-  loadData();
-}
-
 function clearF(type){
   filters[type]='';
   const sel={sector:'selS',cell:'selC',village:'selV',zoning:'selZoning'}[type];
   if(sel){ $(sel).value=''; $(sel).classList.remove('on'); }
-  if(type==='zone') document.querySelectorAll('.zc').forEach(b=>b.classList.remove('on'));
   loadData();
 }
 
 function clearAll(){
   filters={sector:'',cell:'',village:'',zone:'',zoning:''};
   ['selS','selC','selV','selZoning'].forEach(id=>{ $(id).value=''; $(id).classList.remove('on'); });
-  document.querySelectorAll('.zc').forEach(b=>b.classList.remove('on'));
   $('actTags').innerHTML='';
   applyDef('1=1');
   loadData();
@@ -689,8 +665,6 @@ function buildBars(items, total, onClickFn, colorFn){
 function barClick(type, val){
   if(type==='zone'){
     filters.zone = filters.zone===val ? '' : val;
-    document.querySelectorAll('.zc').forEach(b=>b.classList.toggle('on',b.dataset.z===filters.zone));
-    const sel = {sector:'selS',cell:'selC',village:'selV'}[type];
     loadData();
     return;
   }
@@ -1068,7 +1042,7 @@ function renderTable(szRows, grandTotal){
 
 function onTableRow(sector,zone){
   filters.sector=sector; $('selS').value=sector; $('selS').classList.add('on');
-  if(zone&&zone!=='—'){ filters.zone=zone; document.querySelectorAll('.zc').forEach(b=>b.classList.toggle('on',b.dataset.z===zone)); }
+  if(zone&&zone!=='—'){ filters.zone=zone; }
   zoomTo(sector);
   loadData();
   $('viewDiv').scrollIntoView({behavior:'smooth',block:'center'});
