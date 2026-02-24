@@ -46,16 +46,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-
 @keyframes spin{to{transform:rotate(360deg);}}
 .ov-txt{font-size:13px;font-weight:500;color:var(--ink2);}
 
-/* ── PAGE ── */
-.page{max-width:1100px;margin:0 auto;padding:40px 32px 80px;}
+/* ── PAGE — full width with comfortable padding ── */
+.page{max-width:1440px;margin:0 auto;padding:32px 40px 80px;}
 
 /* ── REPORT HEADER ── */
-.report-header{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px;margin-bottom:28px;box-shadow:var(--shadow);display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;}
-.rh-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--blue-lt);border:1px solid rgba(26,86,219,.15);border-radius:100px;font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;}
+.report-header{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow);display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.rh-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--blue-lt);border:1px solid rgba(26,86,219,.15);border-radius:100px;font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
 .rh-tag svg{width:10px;height:10px;stroke:var(--blue);fill:none;stroke-width:2.5;}
-.rh-title{font-size:clamp(22px,3vw,34px);font-weight:800;letter-spacing:-.6px;line-height:1.1;color:var(--ink);margin-bottom:8px;}
+.rh-title{font-size:clamp(22px,2.8vw,32px);font-weight:800;letter-spacing:-.6px;line-height:1.1;color:var(--ink);margin-bottom:6px;}
 .rh-title span{color:var(--blue);}
-.rh-sub{font-size:14px;color:var(--ink2);line-height:1.6;max-width:520px;}
+.rh-sub{font-size:13px;color:var(--ink2);line-height:1.6;max-width:520px;}
 .rh-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;}
 .meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3);font-family:var(--mono);}
 .meta-item svg{width:12px;height:12px;stroke:var(--ink3);fill:none;stroke-width:2;}
@@ -65,7 +65,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-
 .refresh-btn.spin svg{animation:spin .7s linear infinite;}
 
 /* ── FILTER BAR ── */
-.filter-bar{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:28px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.filter-bar{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .fb-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);flex-shrink:0;}
 .fb-label svg{width:12px;height:12px;stroke:var(--ink3);fill:none;stroke-width:2.5;}
 .fb-divider{width:1px;height:24px;background:var(--border);flex-shrink:0;}
@@ -84,66 +84,70 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-
 .tag button svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:3;}
 
 /* ── SECTION ── */
-.section{margin-bottom:28px;}
-.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.section{margin-bottom:20px;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .section-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--ink2);}
 .section-title::before{content:'';width:3px;height:16px;background:var(--blue);border-radius:2px;flex-shrink:0;}
 .section-meta{font-size:11px;color:var(--ink3);font-family:var(--mono);}
 
 /* ── KPI GRID ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px 18px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px 16px 14px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;}
 .kpi-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
 .kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc);}
 .kpi-card.b{--kc:var(--blue);}
 .kpi-card.t{--kc:var(--teal);}
 .kpi-card.v{--kc:var(--violet);}
 .kpi-card.g{--kc:var(--green);}
-.kpi-icon-wrap{width:32px;height:32px;border-radius:8px;background:rgba(0,0,0,.04);display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:var(--kc);}
-.kpi-icon-wrap svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
-.kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);font-weight:700;margin-bottom:5px;}
-.kpi-val{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--kc);line-height:1;margin-bottom:5px;}
-.kpi-sub{font-size:11px;color:var(--ink3);}
+.kpi-icon-wrap{width:28px;height:28px;border-radius:7px;background:rgba(0,0,0,.04);display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:var(--kc);}
+.kpi-icon-wrap svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
+.kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);font-weight:700;margin-bottom:4px;}
+.kpi-val{font-family:var(--mono);font-size:26px;font-weight:500;color:var(--kc);line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:10px;color:var(--ink3);}
+
+/* ── MAP + KPI COMBINED ROW ── */
+.hero-row{display:grid;grid-template-columns:1fr 300px;gap:16px;margin-bottom:20px;}
+.hero-row .map-card{min-height:0;}
+.hero-row .kpi-stack{display:flex;flex-direction:column;gap:12px;}
+.hero-row .kpi-card{flex:1;}
 
 /* ── MAP ── */
-.map-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
-.map-toolbar{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.map-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;}
+.map-toolbar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .map-toolbar-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink);}
 .map-toolbar-title svg{width:15px;height:15px;stroke:var(--blue);fill:none;stroke-width:2;}
 .map-toolbar-hint{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink3);}
 .map-toolbar-hint svg{width:12px;height:12px;stroke:var(--ink3);fill:none;stroke-width:2;}
-#viewDiv{width:100%;height:480px;}
+#viewDiv{width:100%;flex:1;min-height:420px;}
 
 /* ── CHART CARD ── */
-.chart-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);}
-.chart-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);}
+.chart-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
 .chart-card-title{font-size:13px;font-weight:700;color:var(--ink);}
 .chart-card-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
 .chart-total-val{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--ink);text-align:right;}
 .chart-total-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);text-align:right;}
 
 /* ── BAR ROW — clickable ── */
-.bar-list{display:flex;flex-direction:column;gap:6px;}
-.bar-row{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer;transition:background .15s;}
+.bar-list{display:flex;flex-direction:column;gap:5px;}
+.bar-row{display:flex;align-items:center;gap:8px;padding:3px 6px;border-radius:6px;cursor:pointer;transition:background .15s;}
 .bar-row:hover{background:var(--blue-lt);}
 .bar-row.active{background:var(--blue-lt);outline:1.5px solid rgba(26,86,219,.3);outline-offset:-1px;}
 .bar-label{width:72px;font-size:11px;color:var(--ink2);text-align:right;flex-shrink:0;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.bar-track{flex:1;height:24px;background:var(--bg);border-radius:4px;overflow:hidden;}
+.bar-track{flex:1;height:22px;background:var(--bg);border-radius:4px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;min-width:40px;transition:width .55s cubic-bezier(.4,0,.2,1);}
 .bar-fill span{font-family:var(--mono);font-size:10px;font-weight:700;}
 .bar-pct{display:none;}
 
-/* ── TWO / THREE COL ── */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.two-col.wide{grid-template-columns:3fr 2fr;}
-.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+/* ── TWO COL CHARTS ── */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 
 /* ── TABS ── */
 .tab-bar{display:flex;gap:4px;background:var(--bg);padding:3px;border-radius:8px;border:1px solid var(--border);}
-.tab-btn{padding:6px 16px;border:none;background:none;border-radius:6px;font-family:var(--font);font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;transition:all .15s;}
+.tab-btn{padding:5px 14px;border:none;background:none;border-radius:6px;font-family:var(--font);font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;transition:all .15s;}
 .tab-btn:hover{color:var(--ink2);background:rgba(0,0,0,.04);}
 .tab-btn.active{background:var(--white);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,.1);}
-.expand-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:none;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font);font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.expand-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;background:none;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font);font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap;}
 .expand-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-lt);}
 .expand-btn svg{stroke:currentColor;}
 
@@ -151,36 +155,20 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-
 .cv-tt{position:absolute;pointer-events:none;background:var(--ink);color:#fff;padding:7px 11px;border-radius:7px;font-family:var(--mono);font-size:11px;line-height:1.5;white-space:nowrap;z-index:50;box-shadow:0 4px 14px rgba(0,0,0,.25);}
 .cv-tt::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-bottom:none;border-top-color:var(--ink);}
 
-/* ── GROUPED ZONE BAR (stacked segments per row) ── */
-.grp-list{display:flex;flex-direction:column;gap:5px;}
-.grp-row{display:flex;align-items:center;gap:8px;padding:3px 6px;border-radius:6px;cursor:default;transition:background .15s;}
-.grp-row:hover{background:var(--bg);}
-.grp-label{width:80px;font-size:11px;color:var(--ink2);text-align:right;flex-shrink:0;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.grp-total{width:44px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;color:var(--ink2);flex-shrink:0;}
-.sector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
-.sector-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);transition:all .2s;cursor:pointer;}
-.sector-card:hover{box-shadow:var(--shadow-md);border-color:var(--blue);transform:translateY(-2px);}
-.sector-card.active{border-color:var(--blue);background:var(--blue-lt);}
-.sc-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;}
-.sc-val{font-family:var(--mono);font-size:16px;font-weight:500;color:var(--blue);}
-.sc-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);}
-.sc-bar{margin-top:10px;height:4px;background:var(--bg);border-radius:2px;overflow:hidden;}
-.sc-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:2px;transition:width .5s ease;}
-
 /* ── TABLE ── */
 .zone-table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;}
-.zt-toolbar{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.zt-toolbar{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .zt-title{font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;}
 .zt-title svg{width:15px;height:15px;stroke:var(--blue);fill:none;stroke-width:2;}
 .dl-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:var(--green-lt);border:1.5px solid rgba(4,120,87,.2);border-radius:var(--r-sm);color:var(--green);font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;}
 .dl-btn:hover{background:#d1fae5;}
 .dl-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{padding:9px 14px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);font-weight:700;background:var(--bg);border-bottom:1px solid var(--border);white-space:nowrap;}
+thead th{padding:8px 14px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);font-weight:700;background:var(--bg);border-bottom:1px solid var(--border);white-space:nowrap;}
 tbody tr{border-bottom:1px solid #f1f3f7;transition:background .12s;cursor:pointer;}
 tbody tr:hover{background:var(--blue-lt);}
 tbody tr:last-child{border-bottom:none;}
-tbody td{padding:9px 14px;color:var(--ink2);}
+tbody td{padding:8px 14px;color:var(--ink2);}
 tbody td:first-child{color:var(--ink);font-weight:600;}
 .chip{display:inline-block;padding:2px 8px;border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:700;}
 .badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-family:var(--mono);font-size:9px;font-weight:700;background:var(--bg);color:var(--ink3);border:1px solid var(--border);}
@@ -190,15 +178,20 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
 .mini-bar-fill{height:100%;border-radius:3px;transition:width .5s ease;}
 
 /* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .hero-row{grid-template-columns:1fr;} 
+  .hero-row .kpi-stack{display:grid;grid-template-columns:repeat(4,1fr);}
+  .charts-row{grid-template-columns:1fr;}
+}
 @media(max-width:860px){
-  .page{padding:24px 16px 60px;}
-  .kpi-grid,.three-col{grid-template-columns:1fr 1fr;}
-  .two-col,.two-col.wide{grid-template-columns:1fr;}
+  .page{padding:20px 16px 60px;}
+  .hero-row .kpi-stack{grid-template-columns:1fr 1fr;}
+  .charts-row{grid-template-columns:1fr;}
   .report-header{flex-direction:column;}
   .rh-meta{align-items:flex-start;}
 }
 @media(max-width:500px){
-  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .hero-row .kpi-stack{grid-template-columns:1fr 1fr;}
   .filter-bar{flex-direction:column;align-items:flex-start;}
 }
 
@@ -266,134 +259,119 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
     <div class="active-tags" id="actTags"></div>
   </div>
 
-  <!-- SECTION 1 — KPIs -->
+  <!-- SECTION — MAP + KPIs side by side -->
   <div class="section fade-up d3">
     <div class="section-head">
-      <span class="section-title">Overview</span>
+      <span class="section-title">Overview &amp; Spatial Distribution</span>
       <span class="section-meta" id="ovMeta">—</span>
     </div>
-    <div class="kpi-grid">
-      <div class="kpi-card b">
-        <div class="kpi-icon-wrap">
-          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </div>
-        <div class="kpi-label">Total Buildings</div>
-        <div class="kpi-val" id="kT">—</div>
-        <div class="kpi-sub">Detected in Rubavu</div>
-      </div>
-      <div class="kpi-card t">
-        <div class="kpi-icon-wrap">
-          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
-        <div class="kpi-label">Sectors</div>
-        <div class="kpi-val" id="kS">—</div>
-        <div class="kpi-sub">Administrative sectors</div>
-      </div>
-      <div class="kpi-card v">
-        <div class="kpi-icon-wrap">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <div class="kpi-label">Zone Types</div>
-        <div class="kpi-val" id="kZ">—</div>
-        <div class="kpi-sub">Distinct zoning codes</div>
-      </div>
-      <div class="kpi-card g">
-        <div class="kpi-icon-wrap">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        </div>
-        <div class="kpi-label">Villages</div>
-        <div class="kpi-val" id="kV">—</div>
-        <div class="kpi-sub">Covered villages</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECTION 2 — MAP -->
-  <div class="section fade-up d4">
-    <div class="section-head">
-      <span class="section-title">Spatial Distribution</span>
-      <span class="section-meta">Click any building to filter the report</span>
-    </div>
-    <div class="map-card">
-      <div class="map-toolbar">
-        <div class="map-toolbar-title">
-          <svg viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
-          Rubavu District — Building Footprints
-        </div>
-        <div class="map-toolbar-hint">
-          <svg viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg>
-          Click any feature to filter the report
-        </div>
-      </div>
-      <div id="viewDiv"></div>
-    </div>
-  </div>
-
-  <!-- SECTION 3 — BUILDINGS BY ADMINISTRATIVE AREA -->
-  <div class="section fade-up d4">
-    <div class="section-head">
-      <span class="section-title">Buildings by Administrative Area</span>
-      <span class="section-meta" id="areaMeta">—</span>
-    </div>
-    <div class="chart-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
-        <div class="tab-bar" id="adminTabs">
-          <button class="tab-btn active" onclick="switchAdminTab('sector')">Sector</button>
-          <button class="tab-btn" onclick="switchAdminTab('cell')">Cell</button>
-          <button class="tab-btn" onclick="switchAdminTab('village')">Village</button>
-        </div>
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="text-align:right">
-            <div class="chart-total-val" id="adminTot">—</div>
-            <div class="chart-total-lbl" id="adminLbl">Buildings</div>
+    <div class="hero-row">
+      <div class="map-card">
+        <div class="map-toolbar">
+          <div class="map-toolbar-title">
+            <svg viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
+            Rubavu District — Building Footprints
           </div>
-          <button class="expand-btn" id="adminExpandBtn" onclick="toggleAdminExpand()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-            Show all
-          </button>
+          <div class="map-toolbar-hint">
+            <svg viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg>
+            Click feature to filter
+          </div>
+        </div>
+        <div id="viewDiv"></div>
+      </div>
+      <div class="kpi-stack">
+        <div class="kpi-card b">
+          <div class="kpi-icon-wrap">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="kpi-label">Total Buildings</div>
+          <div class="kpi-val" id="kT">—</div>
+          <div class="kpi-sub">Detected in Rubavu</div>
+        </div>
+        <div class="kpi-card t">
+          <div class="kpi-icon-wrap">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="kpi-label">Sectors</div>
+          <div class="kpi-val" id="kS">—</div>
+          <div class="kpi-sub">Administrative sectors</div>
+        </div>
+        <div class="kpi-card v">
+          <div class="kpi-icon-wrap">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="kpi-label">Zone Types</div>
+          <div class="kpi-val" id="kZ">—</div>
+          <div class="kpi-sub">Distinct zoning codes</div>
+        </div>
+        <div class="kpi-card g">
+          <div class="kpi-icon-wrap">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="kpi-label">Villages</div>
+          <div class="kpi-val" id="kV">—</div>
+          <div class="kpi-sub">Covered villages</div>
         </div>
       </div>
-      <div class="bar-list" id="adminBars"></div>
     </div>
   </div>
 
-  <!-- SECTION 4 — BUILDINGS BY ZONING -->
+  <!-- SECTION — ADMIN AREA + ZONING side by side -->
+  <div class="section fade-up d4">
+    <div class="charts-row">
+      <!-- Buildings by Administrative Area -->
+      <div class="chart-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap;">
+          <div class="tab-bar" id="adminTabs">
+            <button class="tab-btn active" onclick="switchAdminTab('sector')">Sector</button>
+            <button class="tab-btn" onclick="switchAdminTab('cell')">Cell</button>
+            <button class="tab-btn" onclick="switchAdminTab('village')">Village</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="text-align:right">
+              <div class="chart-total-val" id="adminTot">—</div>
+              <div class="chart-total-lbl" id="adminLbl">Buildings</div>
+            </div>
+            <button class="expand-btn" id="adminExpandBtn" onclick="toggleAdminExpand()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+              Show all
+            </button>
+          </div>
+        </div>
+        <div class="bar-list" id="adminBars"></div>
+      </div>
+
+      <!-- Buildings by Zoning -->
+      <div class="chart-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;">
+          <div>
+            <div class="chart-card-title">Buildings per Zone Code</div>
+            <div class="chart-card-sub">Click any zone to filter</div>
+          </div>
+          <div style="text-align:right">
+            <div class="chart-total-val" id="zoneTot">—</div>
+            <div class="chart-total-lbl">Total Buildings</div>
+          </div>
+        </div>
+        <div class="bar-list" id="zoneBars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION — ZONING SPLIT BY AREA (canvas stacked chart) -->
   <div class="section fade-up d5">
     <div class="section-head">
-      <span class="section-title">Buildings by Zoning Classification</span>
+      <span class="section-title">Zoning Distribution by Area</span>
       <span class="section-meta" id="zoneMeta">—</span>
     </div>
     <div class="chart-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;">
-        <div>
-          <div class="chart-card-title">Total Buildings per Zone Code</div>
-          <div class="chart-card-sub">Click any zone to filter · zone codes coloured by masterplan classification</div>
-        </div>
-        <div style="text-align:right">
-          <div class="chart-total-val" id="zoneTot">—</div>
-          <div class="chart-total-lbl">Total Buildings</div>
-        </div>
-      </div>
-      <div class="bar-list" id="zoneBars"></div>
-    </div>
-  </div>
-
-  <!-- SECTION 6 — ZONING SPLIT BY AREA -->
-  <div class="section fade-up d6">
-    <div class="section-head">
-      <span class="section-title">Zoning Distribution by Area</span>
-      <span class="section-meta">Top 20 shown · hover to inspect · click to filter</span>
-    </div>
-
-    <div class="chart-card">
-      <!-- Tab bar + total + expand -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap;">
         <div class="tab-bar" id="areaTabs">
           <button class="tab-btn active" onclick="switchTab('sector')">By Sector</button>
           <button class="tab-btn" onclick="switchTab('cell')">By Cell</button>
           <button class="tab-btn" onclick="switchTab('village')">By Village</button>
         </div>
-        <div style="display:flex;align-items:center;gap:14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
           <div style="text-align:right">
             <div class="chart-total-val" id="zbTot">—</div>
             <div class="chart-total-lbl" id="zbLbl">Buildings</div>
@@ -404,18 +382,15 @@ tbody td:first-child{color:var(--ink);font-weight:600;}
           </button>
         </div>
       </div>
-
-      <!-- Chart wrapper — fixed height default, scrollable when expanded -->
       <div id="chartWrap" style="position:relative;overflow:hidden;">
         <canvas id="cvsArea" style="display:block;"></canvas>
         <div id="ttArea" class="cv-tt" style="display:none"></div>
       </div>
     </div>
-
   </div>
 
-  <!-- SECTION 7 — FULL TABLE -->
-  <div class="section fade-up d7">
+  <!-- SECTION — FULL TABLE -->
+  <div class="section fade-up d6">
     <div class="section-head">
       <span class="section-title">Full Building Statistics Table</span>
       <span class="section-meta" id="tableMeta">—</span>
@@ -595,7 +570,6 @@ function populateSel(id,vals,ph){
   vals.forEach(v=>{ const o=document.createElement('option'); o.value=o.textContent=v; s.appendChild(o); });
 }
 
-// ── Filter handlers
 function onF(type,val){
   filters[type]=val;
   const sel={sector:'selS',cell:'selC',village:'selV',zoning:'selZoning'}[type];
@@ -632,10 +606,9 @@ function renderTags(){
 }
 
 // ══════════════════════════════════
-// BAR BUILDER — clickable
+// BAR BUILDER
 // ══════════════════════════════════
 function buildBars(items, total, onClickFn, colorFn){
-  // items: [{label, cnt}]
   const max = items[0]?.cnt||1;
   return items.map(item=>{
     const w   = (item.cnt/max*100).toFixed(1);
@@ -657,7 +630,6 @@ function buildBars(items, total, onClickFn, colorFn){
           <span style="color:${textCol}">${fmt(item.cnt)}</span>
         </div>
       </div>
-      <span class="bar-pct"></span>
     </div>`;
   }).join('');
 }
@@ -686,7 +658,6 @@ async function loadData(){
   setOv('Loading…');
 
   try{
-    // Run all queries in parallel
     const [
       secRows, cellRows, villRows, zoneRows,
       szRows,  distRows
@@ -695,35 +666,28 @@ async function loadData(){
       qStats(where, F.cell),
       qStats(where, F.village),
       qStats(where, F.zone),
-      qStats(where, `${F.sector},${F.zone}`),   // sector x zone for table + zone-per-sector
-      qDistinct(F.village, where)               // village count
+      qStats(where, `${F.sector},${F.zone}`),
+      qDistinct(F.village, where)
     ]);
 
     const total = secRows.reduce((s,f)=>s+f.attributes.cnt,0);
 
-    // KPIs — all from clean arrays (computed below after null filter)
-
-
     const NULL_VALS = new Set(['', '?', 'null', 'blank', 'unknown', 'undefined']);
     const clean = v => v && !NULL_VALS.has(String(v).toLowerCase().trim());
 
-    // Admin area charts — nulls excluded first, then count from clean arrays
     const secSorted  = secRows.filter(f=>clean(f.attributes[F.sector])).map(f=>({label:f.attributes[F.sector],cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
     const cellSorted = cellRows.filter(f=>clean(f.attributes[F.cell])).map(f=>({label:f.attributes[F.cell],cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
     const villSorted = villRows.filter(f=>clean(f.attributes[F.village])).map(f=>({label:f.attributes[F.village],cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
     const zoneSorted = zoneRows.map(f=>({label:f.attributes[F.zone]||'?',cnt:f.attributes.cnt})).sort((a,b)=>b.cnt-a.cnt);
 
-    // Counts derived from clean arrays
     const sectorCount  = secSorted.length;
     const zoneCount    = zoneRows.length;
     const villageCount = villSorted.length;
 
-    // Totals per admin level (sum of cleaned rows)
     const secTotal  = secSorted.reduce((s,r)=>s+r.cnt,0);
     const cellTotal = cellSorted.reduce((s,r)=>s+r.cnt,0);
     const villTotal = villSorted.reduce((s,r)=>s+r.cnt,0);
 
-    // KPIs — from clean arrays
     $('kT').textContent=fmt(total);
     $('kS').textContent=sectorCount;
     $('kZ').textContent=zoneCount;
@@ -731,10 +695,8 @@ async function loadData(){
     $('ovMeta').textContent=`${fmt(total)} buildings across ${sectorCount} sectors`;
 
     $('zoneTot').textContent=fmt(total);
-    $('areaMeta').textContent=`${sectorCount} sectors · ${cellSorted.length} cells · ${villSorted.length} villages`;
-    $('zoneMeta').textContent=`${zoneCount} zone types`;
+    $('zoneMeta').textContent=`${sectorCount} sectors · ${cellSorted.length} cells · ${villSorted.length} villages · ${zoneCount} zone types`;
 
-    // Store admin area data — include per-level total for the card header
     window._adminData = {
       sector:  { items: secSorted,  type: 'sector',  tot: secTotal  },
       cell:    { items: cellSorted, type: 'cell',    tot: cellTotal },
@@ -742,14 +704,12 @@ async function loadData(){
     };
     window._adminTotal = total;
 
-    // Zone split by sector, cell, village (for canvas stacked charts)
     const [sczRows, czRows, vzRows] = await Promise.all([
       qStats(where, `${F.sector},${F.zone}`),
       qStats(where, `${F.cell},${F.zone}`),
       qStats(where, `${F.village},${F.zone}`)
     ]);
 
-    // Store chart data for zone-by-area canvas tab switching
     window._chartData = {
       sector:  { rows: sczRows, field: F.sector,  areas: secSorted.map(s=>s.label)  },
       cell:    { rows: czRows,  field: F.cell,    areas: cellSorted.map(s=>s.label) },
@@ -758,16 +718,12 @@ async function loadData(){
     window._chartTotal = total;
     $('zbTot').textContent = fmt(total);
 
-    // Render all tabbed cards
     renderAdminTab();
     renderActiveTab();
 
-    // Zone bars — direct render, no tabs
     $('zoneBars').innerHTML = buildBars(zoneSorted, total, 'zone', z => zc(z));
 
-    // Full table
     renderTable(szRows, total);
-
     $('tableMeta').textContent=`${tableRows.length} records`;
     setOv(null);
 
@@ -784,9 +740,7 @@ async function refresh(){
   btn.classList.remove('spin');
 }
 
-// ══ TAB + EXPAND CONTROLLERS ══
-
-// ── Admin Area card (Sector / Cell / Village simple bars)
+// ══ Admin Area tabs ══
 let _adminTab      = 'sector';
 let _adminExpanded = false;
 
@@ -810,20 +764,20 @@ function toggleAdminExpand(){
 function renderAdminTab(){
   if(!window._adminData) return;
   const d = window._adminData[_adminTab];
-  const items = _adminExpanded ? d.items : d.items.slice(0, 20);
+  const items = _adminExpanded ? d.items : d.items.slice(0, 15);
   const lblMap = {sector:'Sector', cell:'Cell', village:'Village'};
   $('adminLbl').textContent = lblMap[_adminTab] + ' · Buildings';
   $('adminTot').textContent = fmt(d.tot);
   $('adminBars').innerHTML = buildBars(items, d.tot, d.type, null);
 }
 
-// ── Zone-by-area stacked canvas chart (Section 6)
+// ══ Zone-by-area stacked canvas chart ══
 let _activeTab = 'sector';
 let _expanded  = false;
 
 function switchTab(tab){
   _activeTab = tab;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(tab)));
+  document.querySelectorAll('#areaTabs .tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(tab)));
   renderActiveTab();
 }
 
@@ -847,8 +801,6 @@ function renderActiveTab(){
 
 // ══ CANVAS STACKED BAR CHART ══
 function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
-
-  // ── Aggregate
   const byArea={};
   rows.forEach(f=>{
     const area=f.attributes[areaField];
@@ -863,12 +815,10 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
   const validAreas = areas.filter(a=>byArea[a]);
   if(!validAreas.length) return;
 
-  // Zone order by grand total
   const zTotals={};
   rows.forEach(f=>{ const z=f.attributes[F.zone]||'?'; zTotals[z]=(zTotals[z]||0)+(f.attributes.cnt||0); });
   const allZones=Object.keys(zTotals).sort((a,b)=>zTotals[b]-zTotals[a]);
 
-  // ── Canvas sizing
   const canvas=$(canvasId);
   const wrap=$('chartWrap');
   const dpr=window.devicePixelRatio||1;
@@ -889,16 +839,13 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
   const plotW=CHART_W-MARGIN.left-MARGIN.right;
   const plotH=CHART_H-MARGIN.top-MARGIN.bottom;
 
-  // Bar sizing: distribute bars evenly to fill full plot width
   const GAP    = Math.max(3, Math.min(8, Math.floor(plotW / (validAreas.length * 5))));
   const BAR_W  = Math.max(6, Math.floor((plotW - GAP * (validAreas.length + 1)) / validAreas.length));
   const startX = MARGIN.left + GAP;
 
-  // If expanded and bars would be too narrow, enable horizontal scroll
   const neededW = MARGIN.left + MARGIN.right + (BAR_W + GAP) * validAreas.length + GAP;
   if(neededW > containerW){
     wrap.style.overflowX='auto';
-    // Recalculate with minimum bar width for legibility
     const minBarW = 28;
     const expandedW = MARGIN.left + MARGIN.right + (minBarW + GAP) * validAreas.length + GAP;
     canvas.width = expandedW * dpr;
@@ -910,7 +857,6 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
   const hitMap=[];
   const fType=areaField===F.sector?'sector':areaField===F.cell?'cell':'village';
 
-  // Y scale
   const maxVal=Math.max(...validAreas.map(a=>byArea[a].total));
   const yTick=niceStep(maxVal,5);
   const yMax=Math.ceil(maxVal/yTick)*yTick;
@@ -918,7 +864,6 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
   function yPx(v){ return MARGIN.top+plotH-(v/yMax)*plotH; }
   function fmtK(v){ return v>=1000?(v/1000).toFixed(v%1000===0?0:1)+'k':String(v); }
 
-  // Gridlines + Y labels
   ctx.font=`11px DM Mono, monospace`;
   ctx.textAlign='right';
   ctx.fillStyle='#8e9aac';
@@ -955,7 +900,6 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
       stackY=sy;
     });
 
-    // X label — rotated
     const isActive=filters[fType]===area;
     ctx.save();
     ctx.translate(x+BAR_W/2, CHART_H-MARGIN.bottom+12);
@@ -967,7 +911,6 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
     ctx.restore();
   });
 
-  // Tooltip
   const tt=$(ttId);
 
   function onMove(e){
@@ -978,7 +921,6 @@ function renderGroupedZone(canvasId, ttId, rows, areaField, areas, grandTotal){
       canvas.style.cursor='pointer';
       tt.style.display='block';
       tt.innerHTML=`<strong>${hit.area}</strong><br>${hit.zone} &nbsp;·&nbsp; ${fmt(hit.cnt)} buildings`;
-      // Position tooltip above the segment
       const cx=hit.x+hit.w/2;
       const cy=hit.y;
       tt.style.left=(cx-tt.offsetWidth/2)+'px';
